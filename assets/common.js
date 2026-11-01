@@ -106,24 +106,57 @@ async function exists(url){
   try { const r = await fetch(url, { method: "HEAD", cache: "no-cache" }); return r.ok; } catch(e){ return false; }
 }
 
-/* ---------- 한 줄 소감 · 참관 기록 (Supabase) ---------- */
+/* ---------- 한 줄 소감 · 참관 기록 (Supabase) ----------
+   본인 확인: 소감을 등록할 때 이 기기에 무작위 열쇠(token)를 저장하고, 서버에는 그 해시만 저장합니다.
+   같은 기기(브라우저)에서만 내 소감을 수정·삭제할 수 있습니다.                         */
 const SB = CFG.SUPABASE_URL && CFG.SUPABASE_KEY ? CFG.SUPABASE_URL.replace(/\/$/, "") + "/rest/v1/" : "";
-const sbHeaders = () => ({ apikey: CFG.SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=minimal" });
+const sbHeaders = () => ({ apikey: CFG.SUPABASE_KEY, "Content-Type": "application/json" });
+const MINE_KEY = "maean-mine";
+const mine = () => lsGet(MINE_KEY, {});
+function newToken(){
+  const a = new Uint8Array(32); crypto.getRandomValues(a);
+  return Array.from(a, b => b.toString(16).padStart(2, "0")).join("");
+}
+async function rpc(fn, args){
+  const r = await fetch(SB + "rpc/" + fn, { method: "POST", headers: sbHeaders(), body: JSON.stringify(args) });
+  if (!r.ok) throw new Error(fn + " 실패 " + r.status);
+  return r.json();
+}
 async function listComments(room){
   if (!SB) return lsGet("maean-cmt-" + room, []);
-  const r = await fetch(SB + "maean_comments?select=created_at,text,who&room=eq." + encodeURIComponent(room) + "&order=created_at.desc&limit=200",
+  const r = await fetch(SB + "maean_comments?select=id,created_at,updated_at,text,who&room=eq." + encodeURIComponent(room) + "&order=created_at.desc&limit=200",
                         { headers: { apikey: CFG.SUPABASE_KEY } });
   if (!r.ok) throw new Error("소감 불러오기 실패 " + r.status);
-  return (await r.json()).map(i => ({ t: i.created_at, text: i.text, who: i.who }));
+  return (await r.json()).map(i => ({ id: i.id, t: i.created_at, edited: !!i.updated_at, text: i.text, who: i.who }));
 }
 async function addComment(room, text, who){
-  if (!SB){ const a = lsGet("maean-cmt-" + room, []); a.unshift({ room, text, who, t: new Date().toISOString() }); lsSet("maean-cmt-" + room, a); return; }
-  const r = await fetch(SB + "maean_comments", { method: "POST", headers: sbHeaders(), body: JSON.stringify({ room, text: text.slice(0, 100), who: (who || "").slice(0, 20) }) });
-  if (!r.ok) throw new Error("소감 등록 실패 " + r.status);
+  text = text.slice(0, 100); who = (who || "").slice(0, 20);
+  const token = newToken(), m = mine();
+  if (!SB){
+    const a = lsGet("maean-cmt-" + room, []), id = Date.now();
+    a.unshift({ id, room, text, who, t: new Date().toISOString() }); lsSet("maean-cmt-" + room, a);
+    m[id] = token; lsSet(MINE_KEY, m); return;
+  }
+  const id = await rpc("maean_add_comment", { p_room: room, p_text: text, p_who: who, p_token: token });
+  m[id] = token; lsSet(MINE_KEY, m);
+}
+async function updateComment(room, id, text){
+  text = text.slice(0, 100);
+  if (!SB){
+    const a = lsGet("maean-cmt-" + room, []), it = a.find(x => x.id === id);
+    if (it){ it.text = text; it.edited = true; lsSet("maean-cmt-" + room, a); } return true;
+  }
+  return rpc("maean_update_comment", { p_id: id, p_token: mine()[id] || "", p_text: text });
+}
+async function deleteComment(room, id){
+  const m = mine();
+  if (!SB){ lsSet("maean-cmt-" + room, lsGet("maean-cmt-" + room, []).filter(x => x.id !== id)); }
+  else if (!(await rpc("maean_delete_comment", { p_id: id, p_token: m[id] || "" }))) return false;
+  delete m[id]; lsSet(MINE_KEY, m); return true;
 }
 async function logCheckin(org, name){
   if (!SB) return;
-  try { await fetch(SB + "maean_checkins", { method: "POST", headers: sbHeaders(), body: JSON.stringify({ org: org.slice(0, 30), name: name.slice(0, 15) }) }); } catch(e){}
+  try { await fetch(SB + "maean_checkins", { method: "POST", headers: { ...sbHeaders(), Prefer: "return=minimal" }, body: JSON.stringify({ org: org.slice(0, 30), name: name.slice(0, 15) }) }); } catch(e){}
 }
 function fmtTime(t){ try { const d = new Date(t); return `${d.getMonth()+1}.${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`; } catch(e){ return ""; } }
 
@@ -173,7 +206,7 @@ async function openClassModal(code, room){
         <button class="btn btn-primary" type="submit">등록</button>
       </form>
       <ul class="cmt-list" id="cmList"></ul>
-      ${SB ? "" : `<p class="cmt-hint">미리보기 모드: 소감이 이 기기에만 저장됩니다. (저장소 연결 후 모두에게 공유)</p>`}
+      <p class="cmt-hint">${SB ? "내가 쓴 소감은 이 기기에서 수정·삭제할 수 있습니다." : "미리보기 모드: 소감이 이 기기에만 저장됩니다."}</p>
     </div>`;
   }
   body.innerHTML = h;
@@ -196,9 +229,32 @@ async function openClassModal(code, room){
       list.innerHTML = `<li class="empty-txt">불러오는 중…</li>`;
       let items = []; try { items = await listComments(room); } catch(e){ list.innerHTML = `<li class="empty-txt">소감을 불러오지 못했습니다.</li>`; return; }
       $("#cmCnt").textContent = items.length ? items.length + "개" : "";
-      list.innerHTML = items.length ? items.map(i => `<li>${esc(i.text)}<span class="w">${esc(i.who || "")} ${fmtTime(i.t)}</span></li>`).join("")
-                                    : `<li class="empty-txt">첫 소감을 남겨 주세요.</li>`;
+      const my = mine();
+      list.innerHTML = items.length ? items.map(i => `<li data-id="${i.id}">
+          <span class="tx">${esc(i.text)}</span><span class="w">${esc(i.who || "")} ${fmtTime(i.t)}${i.edited ? " · 수정됨" : ""}</span>
+          ${my[i.id] ? `<span class="own"><button type="button" data-act="edit">수정</button><button type="button" data-act="del">삭제</button></span>` : ""}
+        </li>`).join("") : `<li class="empty-txt">첫 소감을 남겨 주세요.</li>`;
     };
+    $("#cmList").addEventListener("click", async e => {
+      const b = e.target.closest("button[data-act]"); if (!b) return;
+      const li = b.closest("li"), id = Number(li.dataset.id), act = b.dataset.act;
+      if (act === "edit"){
+        const cur = li.querySelector(".tx").textContent;
+        li.innerHTML = `<form class="cmt-edit"><input maxlength="100" required aria-label="소감 수정"><button class="btn btn-primary" type="submit">저장</button><button class="btn btn-ghost" type="button" data-act="cancel">취소</button></form>`;
+        const inp = li.querySelector("input"); inp.value = cur; inp.focus();
+        li.querySelector("form").addEventListener("submit", async ev => {
+          ev.preventDefault(); const t = inp.value.trim(); if (!t) return;
+          try { (await updateComment(room, id, t)) ? toast("소감을 고쳤습니다.") : toast("고칠 수 없는 소감입니다."); } catch(err){ toast("수정하지 못했습니다. 잠시 후 다시 시도해 주세요."); }
+          draw();
+        });
+      } else if (act === "cancel"){ draw(); }
+      else if (act === "del"){
+        li.querySelector(".own").innerHTML = `<span class="ask">삭제할까요?</span><button type="button" data-act="del-yes">삭제</button><button type="button" data-act="cancel">취소</button>`;
+      } else if (act === "del-yes"){
+        try { (await deleteComment(room, id)) ? toast("소감을 삭제했습니다.") : toast("삭제할 수 없는 소감입니다."); } catch(err){ toast("삭제하지 못했습니다. 잠시 후 다시 시도해 주세요."); }
+        draw();
+      }
+    });
     draw();
     const who = $("#cmWho"); who.value = lsGet("maean-who", "");
     $("#cmForm").addEventListener("submit", async e => {
@@ -214,6 +270,7 @@ async function openClassModal(code, room){
 }
 
 function toast(msg){
+  document.querySelectorAll(".toast").forEach(x => x.remove());
   const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; t.setAttribute("role", "status");
   document.body.append(t); setTimeout(() => t.remove(), 2400);
 }

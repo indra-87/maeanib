@@ -173,3 +173,13 @@ footer.site .fname{font-weight:800;color:#fff;font-size:1.05rem;margin-bottom:4p
 
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--teal-900);color:#fff;padding:12px 20px;border-radius:12px;font-size:.9rem;z-index:300;box-shadow:var(--shadow-lg)}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.cmt-list li{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 6px}
+.cmt-list li .tx{word-break:break-all}
+.cmt-list .own{margin-left:auto;display:inline-flex;gap:2px;align-items:center}
+.cmt-list .own button{background:none;border:0;font:600 .76rem var(--font);color:var(--teal-700);cursor:pointer;padding:2px 6px;border-radius:6px}
+.cmt-list .own button:hover{background:var(--teal-50)}
+.cmt-list .own button[data-act="del"],.cmt-list .own button[data-act="del-yes"]{color:#c0392b}
+.cmt-list .own .ask{font-size:.76rem;color:#c0392b;font-weight:600}
+.cmt-edit{display:flex;gap:6px;width:100%}
+.cmt-edit input{flex:1;min-width:0;font-family:inherit;font-size:.9rem;padding:7px 10px;border:1px solid var(--teal-300);border-radius:8px}
+.cmt-edit .btn{padding:7px 12px;font-size:.82rem}
