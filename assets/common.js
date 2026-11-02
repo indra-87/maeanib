@@ -131,8 +131,10 @@ async function deleteComment(id){
   const m = mine(); if (!(await rpc("maean_delete_comment", { p_id: id, p_token: m[id] || "" }))) return false;
   delete m[id]; lsSet(MINE_KEY, m); return true;
 }
-async function logCheckin(org, name){
-  try { await fetch(REST + "maean_checkins", { method: "POST", headers: { ...sbHeaders(), Prefer: "return=minimal" }, body: JSON.stringify({ org: org.slice(0, 30), name: name.slice(0, 15) }) }); } catch(e){}
+async function logCheckin(org, name, sig){
+  const body = { org: org.slice(0, 30), name: name.slice(0, 15) };
+  if (sig && sig.length < 150000) body.sig = sig;      // 참관 등록부에 들어갈 서명 (작게 줄인 PNG)
+  try { await fetch(REST + "maean_checkins", { method: "POST", headers: { ...sbHeaders(), Prefer: "return=minimal" }, body: JSON.stringify(body) }); } catch(e){}
 }
 function fmtTime(t){ try { const d = new Date(t); return `${d.getMonth()+1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`; } catch(e){ return ""; } }
 
