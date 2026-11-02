@@ -285,3 +285,37 @@ body.page-admin{background:#eef0f6}
 .page-admin .help b{color:var(--ink)}
 .page-admin .err{color:#c8423b;font-size:.9rem;min-height:1.3em;margin-top:6px}
 .page-admin .badge-dirty{font-size:.82rem;color:#c8423b;font-weight:600}
+
+/* ===== 휴대폰 화면: 좌우 여백 줄이고 화면을 꽉 채우기 ===== */
+@media(max-width:600px){
+  .wrap{padding:0 14px}
+  .hero{padding:30px 0 34px}
+  .building .roof{margin:0 10px 4px}
+  .floor{grid-template-columns:54px 1fr}
+  .floor .what{padding:9px 12px}
+  .posts{margin-top:-20px}
+  .sec{padding:44px 0}
+  .band{padding:28px 0 24px}
+  /* 교실 카드: 한 줄에 두 개 */
+  .rooms{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .room-plate{padding:8px 10px}
+  .room-plate .code{font-size:1.45rem}
+  .room-plate .fl{font-size:.7rem;padding:1px 6px}
+  .room-body{padding:10px 11px 12px;gap:4px}
+  .room-body .title{font-size:.9rem}
+  .room-body .by,.room-body .subj{font-size:.76rem}
+  .grade{margin-bottom:34px}
+  /* 수업 소개 창: 아래에서 올라오는 전체 폭 시트 */
+  .scrim{padding:0;place-items:end stretch}
+  .sheet{max-width:none;max-height:94vh;border-radius:14px 14px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom))}
+  .sheet h2{font-size:1.45rem}
+  .doc-acts .btn{flex:1}
+  /* 참관 확인 · 편집 페이지: 카드 안쪽 여백 줄이기 */
+  .page-checkin .ck-card,.page-checkin .closed{padding:20px 16px}
+  .page-checkin .sig-box{height:200px}
+  .page-admin .pane{padding:18px 14px}
+  .page-admin .login{margin:8vh auto;padding:24px 18px}
+}
+@media(max-width:360px){
+  .rooms{grid-template-columns:1fr}
+}
