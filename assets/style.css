@@ -349,3 +349,39 @@ body.page-admin{background:#eef0f6}
 .task li::before{content:"";position:absolute;left:0;top:.7em;width:6px;height:6px;border-radius:50%;background:var(--fc)}
 @media(max-width:860px){.tasks{grid-template-columns:1fr}}
 .room-body .stage{font-size:.74rem;font-weight:700;color:var(--ink-soft);background:var(--paper);border-radius:999px;padding:1px 8px;align-self:flex-start}
+
+/* ===== 사전 질문 ===== */
+.page-questions .q-wrap{max-width:820px}
+.page-questions .q-form,.page-questions .q-edit{background:#fff;border-radius:10px;padding:22px;box-shadow:0 0 0 1px var(--line);display:flex;flex-direction:column;gap:12px}
+.page-questions .q-edit{box-shadow:none;padding:0;background:none}
+.page-questions .q-who{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.page-questions label{display:flex;flex-direction:column;gap:5px}
+.page-questions label>span{font-weight:600;font-size:.9rem}
+.page-questions input,.page-questions textarea{font:inherit;font-size:.97rem;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:#fff;width:100%}
+.page-questions textarea{min-height:110px;resize:vertical;line-height:1.6}
+.page-questions input:focus,.page-questions textarea:focus{border-color:var(--act);outline:none}
+.page-questions .q-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.page-questions .q-foot small{color:var(--ink-soft);font-size:.82rem;flex:1;min-width:200px}
+.page-questions .q-head{display:flex;justify-content:space-between;align-items:center;margin:34px 0 12px;border-bottom:2px solid var(--ink);padding-bottom:8px}
+.page-questions .q-head h2{font:1.5rem var(--display)}
+.page-questions .q-head h2 span{font:500 .9rem var(--body);color:var(--ink-soft);margin-left:4px}
+.page-questions .q-head .btn{padding:6px 12px;font-size:.85rem}
+.page-questions .q-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+.page-questions .q-item{background:#fff;border-radius:10px;padding:16px 18px;box-shadow:0 0 0 1px var(--line)}
+.page-questions .q-body{white-space:pre-line;overflow-wrap:anywhere;font-size:.98rem}
+.page-questions .q-meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-top:8px;font-size:.8rem;color:var(--ink-soft)}
+.page-questions .q-by{font-weight:600;color:var(--ink)}
+.page-questions .q-by.anon{color:var(--ink-soft)}
+.page-questions .own{margin-left:auto;display:inline-flex;gap:2px;align-items:center}
+.page-questions .own button{background:none;border:0;font:600 .8rem var(--body);color:var(--act);cursor:pointer;padding:3px 7px;border-radius:5px}
+.page-questions .own button[data-a^="del"],.page-questions .own .ask{color:#c8423b}
+.page-questions .own .ask{font-weight:600}
+@media(max-width:520px){.page-questions .q-who{grid-template-columns:1fr 1fr}.page-questions .q-form{padding:16px}.page-questions .q-foot .btn{width:100%}}
+/* 첫 화면 바로가기 5개 */
+.posts-in{grid-template-columns:repeat(5,1fr)}
+@media(max-width:860px){.posts-in{grid-template-columns:1fr 1fr}.post:nth-child(n){border-left:1px solid var(--line);border-top:0}.post:nth-child(odd){border-left:0}.post:nth-child(n+3){border-top:1px solid var(--line)}.post:nth-child(5){grid-column:1/-1}}
+@media(max-width:520px){.posts-in{grid-template-columns:1fr}.post:nth-child(n){border-left:0;border-top:1px solid var(--line)}.post:first-child{border-top:0}}
+/* 메뉴 5개: 휴대폰에서 줄바꿈 없이 한 줄, 넘치면 옆으로 밀기 */
+.menu a{white-space:nowrap;flex-shrink:0}
+@media(max-width:820px){.menu{gap:0;scrollbar-width:none}.menu::-webkit-scrollbar{display:none}.menu a{padding:7px 8px;font-size:.86rem}}
+@media(max-width:360px){.menu a{padding:7px 6px;font-size:.82rem}}

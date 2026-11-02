@@ -79,13 +79,9 @@ const NAV = [
   ["classes.html", "공개수업"],
   ["index.html#schedule", "당일 일정"],
   ["campus.html", "학교 공간"],
+  ["questions.html", "사전 질문"],
   ["checkin.html", "참관 확인"],
 ];
-function registerHtml(){
-  if (CFG.REGISTER_URL && CFG.REGISTER_OPEN !== false)
-    return `<a class="btn btn-act" href="${esc(CFG.REGISTER_URL)}" target="_blank" rel="noopener noreferrer">참관 신청<span class="sr-only"> (새 창)</span></a>`;
-  return `<span class="btn btn-off">${CFG.REGISTER_URL ? "참관 신청 마감" : "참관 신청 준비 중"}</span>`;
-}
 /* 휴대폰인데 브라우저가 'PC 버전'으로 보여 주고 있으면 (화면이 작게 축소되어 보임) 안내 띠를 띄웁니다 */
 function pcModeHint(){
   try {
@@ -107,14 +103,12 @@ function renderChrome(active){
       <span class="brand-name">${esc(BASE.SCHOOL_NAME || "")}<small>연구학교 보고회</small></span>
     </a>
     <nav class="menu" aria-label="주 메뉴">${NAV.map(([href, t]) => `<a href="${href}"${active === href ? ' aria-current="page"' : ""}>${t}</a>`).join("")}</nav>
-    <div class="reg" id="regSlot">${registerHtml()}</div>
   </div>`;
   document.body.prepend(h);
   const f = document.createElement("footer"); f.className = "foot";
   f.innerHTML = `<div class="wrap"><b>${esc(BASE.SCHOOL_NAME || "")}</b><span id="footTopic">연구학교 운영 결과 보고회</span></div>`;
   document.body.append(f);
   loadContent().then(() => {
-    $("#regSlot").innerHTML = registerHtml();
     if (CFG.RESEARCH_TOPIC) $("#footTopic").textContent = CFG.RESEARCH_TOPIC;
   }).catch(() => {});
 }
@@ -268,6 +262,6 @@ function toast(msg){
   document.body.append(t); setTimeout(() => t.remove(), 2600);
 }
 
-window.Maean = { CFG, BASE, esc, renderChrome, loadContent, loadError, openClassModal, checkinOpen, fileUrl, downloadUrl, logCheckin, toast, kstToday, FLOOR_EXTRA, floorOf };
+window.Maean = { CFG, BASE, esc, rpc, newToken, lsGet, lsSet, REST, KEY, fmtTime, renderChrome, loadContent, loadError, openClassModal, checkinOpen, fileUrl, downloadUrl, logCheckin, toast, kstToday, FLOOR_EXTRA, floorOf };
 window.openClassModal = openClassModal;   // 3D 뷰어(iframe)가 이 함수를 부릅니다
 })();
