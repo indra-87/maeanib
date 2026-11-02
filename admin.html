@@ -9,6 +9,8 @@
 <script src="assets/config.js"></script>
 <script src="assets/common.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
 <body class="page-admin">
 <header class="ad-top"><div class="wrap"><b>보고회 안내 편집</b><a href="index.html" target="_blank" rel="noopener">사이트 보기</a><button id="logout" hidden>나가기</button></div></header>
@@ -107,10 +109,19 @@
 
     <!-- 참관자 명단 -->
     <section class="pane" data-tab="checkins" hidden>
-      <h2>참관자 명단</h2>
-      <p class="desc">참관증을 받은 분들의 소속과 이름입니다. 서명 이미지는 저장하지 않습니다.</p>
-      <div class="bar"><b id="ckCount"></b><span class="sp"></span><button class="btn btn-line" id="ckReload">새로고침</button><button class="btn btn-act" id="ckCsv">엑셀(CSV)로 내려받기</button></div>
+      <h2>참관자 명단 · 참관 등록부</h2>
+      <p class="desc">참관증을 받은 분들이 자동으로 쌓입니다. 잘못 적은 이름은 고치고, 시험 삼아 넣은 줄은 지울 수 있습니다. 서명이 들어간 등록부를 PDF로 내려받아 학교에 보관하세요.</p>
+      <div class="bar"><b id="ckCount"></b><span class="sp"></span><button class="btn btn-line" id="ckReload">새로고침</button><button class="btn btn-line" id="ckCsv">엑셀(CSV)로 내려받기</button></div>
       <div class="tblwrap"><table class="list" id="ckTable"></table></div>
+
+      <h3 class="reg-h">참관 등록부 PDF</h3>
+      <div class="two">
+        <label class="f"><span>등록부 제목</span><input type="text" id="rgTitle"></label>
+        <label class="f"><span>한 쪽에 들어갈 사람 수</span><select id="rgPer"><option>15</option><option selected>20</option><option>25</option></select></label>
+      </div>
+      <label class="f"><span>제목 아래 안내 (한 줄에 하나, 앞에 □ 가 붙습니다)</span><textarea id="rgInfo" style="min-height:64px"></textarea></label>
+      <div class="bar"><span class="muted" id="rgPages"></span><span class="sp"></span><button class="btn btn-act" id="rgPdf">등록부 PDF 내려받기</button></div>
+      <div class="reg-preview" id="rgPreview" aria-label="등록부 미리보기"></div>
     </section>
 
     <!-- 비밀번호 -->
@@ -453,17 +464,92 @@ $("#cmTable").onclick = async e => {
 
 /* ---------- 참관자 명단 ---------- */
 let CK = [];
+const fmtT = t => new Date(t).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
 async function loadCheckins(){
   try { CK = (await rpc("maean_admin_checkins")).items || []; } catch(e){ toast(e.message); return; }
+  drawCheckins(); drawRegister();
+}
+function drawCheckins(){
   $("#ckCount").textContent = `${CK.length}명`;
-  $("#ckTable").innerHTML = CK.length ? `<thead><tr><th>번호</th><th>소속</th><th>성명</th><th>시간</th></tr></thead><tbody>` + CK.map((c, i) => `<tr><td>${i+1}</td><td>${esc(c.org)}</td><td>${esc(c.name)}</td><td>${new Date(c.t).toLocaleString("ko-KR")}</td></tr>`).join("") + "</tbody>"
+  $("#ckTable").innerHTML = CK.length ? `<thead><tr><th>연번</th><th>소속</th><th>성명</th><th>서명</th><th>시간</th><th></th></tr></thead><tbody>` + CK.map((c, i) => `<tr data-id="${c.id}">
+      <td>${i+1}</td><td class="c-org">${esc(c.org)}</td><td class="c-name">${esc(c.name)}</td>
+      <td>${c.sig ? `<img class="sig-thumb" src="${esc(c.sig)}" alt="${esc(c.name)} 서명">` : '<span class="no">없음</span>'}</td>
+      <td style="white-space:nowrap">${fmtT(c.t)}</td>
+      <td class="row-acts"><button class="btn btn-line" data-a="edit">고치기</button><button class="btn btn-line danger" data-a="del">지우기</button></td></tr>`).join("") + "</tbody>"
     : `<tr><td class="muted">아직 참관증을 받은 분이 없습니다.</td></tr>`;
 }
+$("#ckTable").onclick = async e => {
+  const b = e.target.closest("button[data-a]"); if (!b) return;
+  const tr = b.closest("tr"), id = +tr.dataset.id, c = CK.find(x => x.id === id), a = b.dataset.a;
+  if (a === "edit"){
+    tr.querySelector(".c-org").innerHTML = `<input class="cell-in" maxlength="30" value="${esc(c.org)}" aria-label="소속">`;
+    tr.querySelector(".c-name").innerHTML = `<input class="cell-in" maxlength="15" value="${esc(c.name)}" aria-label="성명">`;
+    tr.querySelector(".row-acts").innerHTML = `<button class="btn btn-act" data-a="save">저장</button><button class="btn btn-line" data-a="cancel">취소</button>`;
+    tr.querySelector(".c-org input").focus();
+  } else if (a === "cancel") drawCheckins();
+  else if (a === "save"){
+    const org = tr.querySelector(".c-org input").value.trim(), name = tr.querySelector(".c-name input").value.trim();
+    if (!org || !name){ toast("소속과 성명을 모두 적어 주세요."); return; }
+    try { await rpc("maean_admin_checkin_update", { p_id: id, p_org: org, p_name: name }); Object.assign(c, { org, name }); drawCheckins(); drawRegister(); toast("고쳤습니다."); } catch(err){ toast(err.message); }
+  } else if (a === "del"){
+    tr.querySelector(".row-acts").innerHTML = `<span class="ask">${esc(c.name)} 님을 지울까요?</span><button class="btn btn-line danger" data-a="del-yes">지우기</button><button class="btn btn-line" data-a="cancel">취소</button>`;
+  } else if (a === "del-yes"){
+    try { await rpc("maean_admin_checkin_delete", { p_id: id }); CK = CK.filter(x => x.id !== id); drawCheckins(); drawRegister(); toast("지웠습니다."); } catch(err){ toast(err.message); }
+  }
+};
 $("#ckReload").onclick = loadCheckins;
 $("#ckCsv").onclick = () => {
   const q = s => `"${String(s).replace(/"/g, '""')}"`;
-  const csv = "﻿" + [["번호","소속","성명","시간"], ...CK.map((c, i) => [i+1, c.org, c.name, new Date(c.t).toLocaleString("ko-KR")])].map(r => r.map(q).join(",")).join("\r\n");
+  const csv = "\ufeff" + [["연번","소속","성명","시간"], ...CK.map((c, i) => [i+1, c.org, c.name, new Date(c.t).toLocaleString("ko-KR")])].map(r => r.map(q).join(",")).join("\r\n");
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = "참관자명단.csv"; a.click();
+};
+
+/* ---------- 참관 등록부 (A4, 서명 포함) ---------- */
+function regDefaults(){
+  const s = C.settings.data;
+  if (!$("#rgTitle").value) $("#rgTitle").value = localStorage.getItem("maean-rg-title") || `${s.RESEARCH_TOPIC || "매안초등학교 연구학교 보고회"} 참관 등록부`;
+  if (!$("#rgInfo").value) $("#rgInfo").value = localStorage.getItem("maean-rg-info") ?? (s.EVENT_DATE_LABEL ? `일시 : ${s.EVENT_DATE_LABEL}` : "일시 : ");
+}
+function drawRegister(){
+  regDefaults();
+  const per = +$("#rgPer").value, title = $("#rgTitle").value.trim(), info = $("#rgInfo").value.split("\n").map(x => x.trim()).filter(Boolean);
+  const pages = Math.max(1, Math.ceil(CK.length / per));
+  $("#rgPages").textContent = `${CK.length}명 · A4 ${pages}쪽`;
+  let html = "";
+  for (let p = 0; p < pages; p++){
+    const rows = [];
+    for (let i = p * per; i < (p + 1) * per; i++){
+      const c = CK[i];
+      rows.push(`<tr><td>${c ? i + 1 : ""}</td><td>${c ? esc(c.org) : ""}</td><td>${c ? esc(c.name) : ""}</td><td class="sg">${c && c.sig ? `<img src="${esc(c.sig)}" alt="">` : ""}</td></tr>`);
+    }
+    html += `<div class="rg-scale"><div class="rg-page" style="--rh:${Math.floor((1123 - 112 - 150 - 28 * info.length - 38) / per)}px">
+      <div class="rg-bar top"></div><h1>${esc(title)}</h1><div class="rg-bar bottom"></div>
+      <ul class="rg-info">${info.map(t => `<li>${esc(t)}</li>`).join("")}</ul>
+      <table class="rg-table"><thead><tr><th style="width:14%">연번</th><th style="width:33%">소속</th><th style="width:23%">성명</th><th>서 명</th></tr></thead><tbody>${rows.join("")}</tbody></table>
+      ${pages > 1 ? `<div class="rg-no">${p + 1} / ${pages}</div>` : ""}
+    </div></div>`;
+  }
+  $("#rgPreview").innerHTML = html;
+}
+["rgTitle","rgInfo"].forEach(id => $("#" + id).addEventListener("input", () => { localStorage.setItem(id === "rgTitle" ? "maean-rg-title" : "maean-rg-info", $("#" + id).value); drawRegister(); }));
+$("#rgPer").onchange = drawRegister;
+$("#rgPdf").onclick = async () => {
+  if (!CK.length){ toast("아직 등록된 참관자가 없습니다."); return; }
+  const btn = $("#rgPdf"); btn.disabled = true; btn.textContent = "만드는 중…";
+  try {
+    await document.fonts.ready;
+    const pdf = new jspdf.jsPDF({ orientation: "p", unit: "mm", format: "a4" });
+    const pages = [...document.querySelectorAll("#rgPreview .rg-page")];
+    for (let i = 0; i < pages.length; i++){
+      const cv = await html2canvas(pages[i], { scale: 2, backgroundColor: "#fff",
+        onclone: d => d.querySelectorAll(".rg-page").forEach(x => { x.style.transform = "none"; x.style.boxShadow = "none"; }) });
+      if (i) pdf.addPage();
+      pdf.addImage(cv.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, 210, 297);
+    }
+    const day = (C.settings.data.EVENT_DATE || new Date().toISOString().slice(0, 10));
+    pdf.save(`참관등록부_${day}.pdf`);
+  } catch(err){ toast("PDF를 만들지 못했습니다: " + err.message); }
+  btn.disabled = false; btn.textContent = "등록부 PDF 내려받기";
 };
 
 /* ---------- 비밀번호 ---------- */

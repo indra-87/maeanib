@@ -26,7 +26,7 @@
       <div class="field"><label for="name">성명</label><input id="name" maxlength="15" placeholder="예) 홍길동" autocomplete="name" required></div>
       <div class="field"><label>서명 <span style="font-weight:500;color:var(--ink-soft);font-size:.84rem">손가락이나 마우스로 직접 써 주세요</span></label>
         <div class="sig-box"><canvas id="sig" aria-label="서명 입력란"></canvas><div class="sig-ph" id="sigPh">여기에 서명하세요</div></div>
-        <div class="sig-tools"><button type="button" id="sigClear">↺ 다시 쓰기</button></div>
+        <div class="sig-tools"><span class="sig-note">소속·성명·서명은 학교 참관 등록부에 함께 보관됩니다.</span><button type="button" id="sigClear">↺ 다시 쓰기</button></div>
       </div>
       <div class="err" id="err" role="alert"></div>
       <button class="btn btn-act" style="width:100%;padding:14px;font-size:1.05rem" type="submit">참관증 받기</button>
@@ -106,6 +106,19 @@ function trimmedSignature(){
   return c.toDataURL("image/png");
 }
 
+/* 등록부 보관용: 서명을 높이 90px 이하로 줄여 저장 (보통 5~15KB) */
+function smallSignature(src){
+  return new Promise(res => {
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, 90 / img.height, 360 / img.width), c = document.createElement("canvas");
+      c.width = Math.max(1, Math.round(img.width * k)); c.height = Math.max(1, Math.round(img.height * k));
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); res(c.toDataURL("image/png"));
+    };
+    img.onerror = () => res(""); img.src = src;
+  });
+}
+
 /* ── 참관증 ── */
 function today(){ const d = new Date(); return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`; }
 function fitCert(){
@@ -133,13 +146,14 @@ $("ckForm").addEventListener("submit", e => {
   $("err").textContent = "";
   $("cTitle").textContent = CFG.CERT_TITLE || "참 관 증";
   $("cOrg").textContent = org; $("cName").textContent = name;
-  $("cSig").src = trimmedSignature();
+  const sigFull = trimmedSignature();
+  $("cSig").src = sigFull;
   $("cBody").textContent = CFG.CERT_BODY || "";
   $("cDate").textContent = today();
   $("cSigner").textContent = CFG.CERT_SIGNER || "";
   $("formView").hidden = true; $("ckHero").hidden = true; $("certView").hidden = false;
   scrollTo(0, 0); fitCert(); setSeal();
-  Maean.logCheckin(org, name);
+  smallSignature(sigFull).then(small => Maean.logCheckin(org, name, small));
 });
 addEventListener("resize", () => { if (!$("certView").hidden) fitCert(); });
 $("btnBack").addEventListener("click", () => { $("certView").hidden = true; $("ckHero").hidden = false; $("formView").hidden = false; sizeCanvas(); });
