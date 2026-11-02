@@ -29,15 +29,23 @@
   <div class="wrap"><div class="posts-in">
     <a class="post" href="classes.html"><span class="ic" aria-hidden="true">📚</span><b>공개수업</b><span id="postClasses">학년별 수업 소개와 수업안</span></a>
     <a class="post" href="#schedule"><span class="ic" aria-hidden="true">🕐</span><b>당일 일정</b><span>등록부터 결과 발표까지</span></a>
-    <a class="post" href="campus.html"><span class="ic" aria-hidden="true">🅿️</span><b>주차 · 학교 공간</b><span>3D 층별 배치도</span></a>
+    <a class="post" href="campus.html"><span class="ic" aria-hidden="true">🗺️</span><b>학교 공간</b><span>3D 층별 배치도, 2층 강당</span></a>
     <a class="post" id="postCheckin" href="checkin.html"><span class="ic" aria-hidden="true">✍️</span><b>참관 확인</b><span>서명하고 참관증 받기</span></a>
   </div></div>
 </nav>
 
+<section class="sec" id="tasks" hidden style="padding-bottom:0">
+  <div class="wrap">
+    <h2 class="sec-title">연구 과제</h2>
+    <p class="sec-lead" id="tasksLead"></p>
+    <div class="tasks" id="taskList"></div>
+  </div>
+</section>
+
 <section class="sec" id="schedule">
   <div class="wrap">
     <h2 class="sec-title">당일 일정</h2>
-    <p class="sec-lead" id="schLead">등록은 1층 중앙현관에서 합니다.</p>
+    <p class="sec-lead" id="schLead">등록은 1층에서 하고, 운영 결과 공유는 2층 강당에서 열립니다.</p>
     <ol class="timeline" id="timeline"><li class="muted">불러오는 중…</li></ol>
     <p class="sch-note" id="schNote"></p>
   </div>
@@ -60,6 +68,16 @@ Maean.loadContent().then(({ classes, schedule, files }) => {
   if (CFG.RESEARCH_SUB) document.getElementById("heroSub").textContent = CFG.RESEARCH_SUB;
   const badges = [CFG.EVENT_DATE_LABEL, ...(CFG.HERO_BADGES || [])].filter(Boolean);
   if (badges.length){ const b = document.getElementById("heroBadges"); b.hidden = false; b.innerHTML = badges.map(t => `<span>${esc(t)}</span>`).join(""); }
+
+  /* 연구 과제 (편집 페이지 '사이트 설정'에서 입력: 과제마다 빈 줄로 구분, 첫 줄이 제목) */
+  const tasks = String(CFG.RESEARCH_TASKS || "").split(/\n\s*\n/).map(b => b.split("\n").map(x => x.trim()).filter(Boolean)).filter(b => b.length);
+  if (tasks.length){
+    document.getElementById("tasks").hidden = false;
+    document.getElementById("tasksLead").textContent = CFG.RESEARCH_TOPIC ? `연구 주제: ${CFG.RESEARCH_TOPIC}` : "";
+    const fc = [3, 2, 5, 4, 1];
+    document.getElementById("taskList").innerHTML = tasks.map((t, i) => `<article class="task" data-floor="${fc[i % 5]}"><span class="no">연구과제 ${i + 1}</span>
+      <h3>${esc(t[0])}</h3><ul>${t.slice(1).map(x => `<li>${esc(x.replace(/^[-·•]\s*/, ""))}</li>`).join("")}</ul></article>`).join("");
+  }
 
   /* 건물 단면: 5층부터 1층까지 */
   const open = classes.filter(c => c.open !== false);

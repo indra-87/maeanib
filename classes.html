@@ -47,8 +47,9 @@ Maean.loadContent().then(({ classes }) => {
           <button class="room" data-code="${esc(c.code)}" data-floor="${esc(c.floor)}">
             <span class="room-plate"><span class="code">${esc(c.code)}</span>${c.floor ? `<span class="fl">${c.floor}층</span>` : ""}</span>
             <span class="room-body">
-              ${c.subject ? `<span class="subj">${esc(c.subject)}</span>` : ""}
+              ${c.subject ? `<span class="subj">${esc(c.subject.replace(/\s*\(.*\)\s*$/, ""))}</span>` : ""}
               <span class="title${c.title ? "" : " none"}">${esc(c.title || "수업 소개 준비 중")}</span>
+              ${c.stage ? `<span class="stage">${esc(c.stage)}</span>` : ""}
               ${c.teacher ? `<span class="by">${esc(c.teacher)}</span>` : ""}
               ${c.plan ? `<span class="pdf">수업안 있음</span>` : ""}
             </span>

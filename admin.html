@@ -72,6 +72,7 @@
         </div>
         <label class="f"><span>추가 안내 (한 줄에 하나)</span><textarea name="HERO_BADGES" style="min-height:60px" placeholder="공개수업 41학급&#10;등록 13:30부터"></textarea></label>
         <label class="f"><span>일정 아래 안내 문구</span><input type="text" name="SCHEDULE_NOTE"></label>
+        <label class="f"><span>연구 과제</span><textarea name="RESEARCH_TASKS" style="min-height:220px" placeholder="교육공동체가 함께 만들어가는 IB PYP 실행 기반 조성&#10;협의회 정례화를 통한 …&#10;&#10;(빈 줄) 다음 과제 제목&#10;…"></textarea><small>과제마다 빈 줄로 구분합니다. 첫 줄은 과제 제목, 다음 줄부터 세부 내용입니다. 비워 두면 첫 화면에 나오지 않습니다.</small></label>
 
         <h3 style="font:1.2rem var(--display);margin:18px 0 10px">참관 신청</h3>
         <label class="f"><span>참관 신청 링크</span><input type="url" name="REGISTER_URL" placeholder="https://forms.gle/…"></label>
@@ -142,13 +143,13 @@
 <div class="scrim" id="edScrim" hidden>
   <form class="sheet" id="edForm" role="dialog" aria-modal="true" aria-labelledby="edTitle">
     <div class="sheet-head"><span class="plate" id="edPlate"></span><h2 id="edTitle" style="font-size:1.3rem">수업 소개 고치기</h2><button type="button" class="x" id="edClose" aria-label="닫기">✕</button></div>
+    <label class="f"><span>탐구 주제 (카드의 큰 제목)</span><input type="text" name="title"></label>
     <div class="two">
-      <label class="f"><span>교과</span><input type="text" name="subject"></label>
+      <label class="f"><span>초학문적 주제</span><input type="text" name="subject" placeholder="우리 모두의 지구 (Sharing the planet)"></label>
+      <label class="f"><span>탐구 단원</span><input type="text" name="unit"></label>
+      <label class="f"><span>탐구 단계</span><input type="text" name="stage" placeholder="조사하기"></label>
+      <label class="f"><span>차시</span><input type="text" name="period" placeholder="5/44"></label>
       <label class="f"><span>수업자</span><input type="text" name="teacher"></label>
-    </div>
-    <label class="f"><span>수업 주제</span><input type="text" name="title"></label>
-    <div class="two">
-      <label class="f"><span>단원</span><input type="text" name="unit"></label>
       <label class="f"><span>장소</span><input type="text" name="place"><small>'2층'처럼 층을 적으면 위치 보기가 연결됩니다.</small></label>
     </div>
     <label class="f"><span>참관 포인트</span><textarea name="point"></textarea></label>
@@ -251,8 +252,8 @@ function renderAll(){ renderClasses(); renderSchedule(); renderFiles(); renderSe
 const floorOf = c => ((c.place || "").match(/(\d)\s*층/) || [])[1] || "";
 function renderClasses(){
   const cs = C.classes.data;
-  $("#classTable").innerHTML = `<thead><tr><th>교실</th><th>교과</th><th>수업 주제</th><th>수업자</th><th>수업안</th><th>공개</th></tr></thead><tbody>` +
-    cs.map((c, i) => `<tr class="click" data-i="${i}"><td><span class="tag" data-floor="${floorOf(c)}">${esc(c.code)}</span></td><td>${esc(c.subject)}</td>
+  $("#classTable").innerHTML = `<thead><tr><th>교실</th><th>탐구 단계</th><th>탐구 주제</th><th>수업자</th><th>수업안</th><th>공개</th></tr></thead><tbody>` +
+    cs.map((c, i) => `<tr class="click" data-i="${i}"><td><span class="tag" data-floor="${floorOf(c)}">${esc(c.code)}</span></td><td>${esc(c.stage)}</td>
       <td>${c.title ? esc(c.title) : '<span class="no">비어 있음</span>'}</td><td>${esc(c.teacher)}</td>
       <td>${c.plan ? '<span class="ok">있음</span>' : '<span class="no">없음</span>'}</td><td>${c.open !== false ? "보임" : '<span class="no">숨김</span>'}</td></tr>`).join("") + "</tbody>";
 }
@@ -262,7 +263,7 @@ let edCode = null, edPlan = null;   // edPlan: {plan, planName} 편집 중인 �
 function openEditor(code){
   const c = C.classes.data.find(x => x.code === code); edCode = code; edPlan = { plan: c.plan || "", planName: c.planName || "" };
   const f = $("#edForm");
-  ["subject","teacher","title","unit","place","point"].forEach(k => f.elements[k].value = c[k] || "");
+  ["subject","teacher","title","unit","stage","period","place","point"].forEach(k => f.elements[k].value = c[k] || "");
   f.elements.open.checked = c.open !== false;
   f.elements.planLink.value = /^https?:/i.test(c.plan) ? c.plan : "";
   $("#edPlate").textContent = code; f.dataset.floor = floorOf(c);
@@ -283,7 +284,7 @@ $("#edForm").addEventListener("submit", async e => {
   e.preventDefault();
   const f = e.target, code = edCode, link = f.elements.planLink.value.trim();
   const plan = link ? { plan: link, planName: "" } : edPlan;
-  const vals = Object.fromEntries(["subject","teacher","title","unit","place","point"].map(k => [k, f.elements[k].value.trim()]));
+  const vals = Object.fromEntries(["subject","teacher","title","unit","stage","period","place","point"].map(k => [k, f.elements[k].value.trim()]));
   let old = "";
   const ok = await save("classes", d => { const c = d.find(x => x.code === code); old = c.plan; Object.assign(c, vals, plan, { open: f.elements.open.checked }); return d; }).catch(err => (toast(err.message), false));
   if (ok){ if (old && old !== plan.plan) removeFiles([old]); renderClasses(); closeEditor(); toast(`${code} 수업 소개를 저장했습니다.`); }
@@ -309,11 +310,11 @@ $("#pdfBulk").onchange = async e => {
 };
 
 /* 엑셀 */
-const XCOLS = ["교실코드","학년","반","교과","단원","수업 주제","수업자","장소","참관 포인트","수업안 링크","공개"];
+const XCOLS = ["교실코드","학년","반","초학문적 주제","탐구 단원","탐구 단계","차시","탐구 주제","수업자","장소","참관 포인트","수업안 링크","공개"];
 $("#xlsxOut").onclick = () => {
-  const rows = C.classes.data.map(c => [c.code, c.grade, c.cls, c.subject, c.unit, c.title, c.teacher, c.place, c.point, /^https?:/i.test(c.plan) ? c.plan : "", c.open !== false ? "O" : "X"]);
+  const rows = C.classes.data.map(c => [c.code, c.grade, c.cls, c.subject, c.unit, c.stage, c.period, c.title, c.teacher, c.place, c.point, /^https?:/i.test(c.plan) ? c.plan : "", c.open !== false ? "O" : "X"]);
   const ws = XLSX.utils.aoa_to_sheet([XCOLS, ...rows]);
-  ws["!cols"] = [10,6,5,10,18,32,10,14,44,24,6].map(w => ({ wch: w }));
+  ws["!cols"] = [8,5,4,26,14,14,8,40,10,14,40,20,5].map(w => ({ wch: w }));
   const guide = XLSX.utils.aoa_to_sheet([["작성법"],["교실코드는 바꾸지 마세요."],["참관 포인트는 셀 안 줄바꿈(Alt+Enter)도 그대로 보입니다."],["수업안 PDF는 편집 페이지에서 올립니다. 외부 링크로 연결할 때만 '수업안 링크'에 https:// 주소를 적습니다."],["공개: X 로 적으면 공개수업 목록에서 숨겨집니다."]]);
   guide["!cols"] = [{ wch: 90 }];
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "수업안내"); XLSX.utils.book_append_sheet(wb, guide, "작성법");
@@ -326,7 +327,8 @@ $("#xlsxIn").onchange = async e => {
     const ws = wb.Sheets["수업안내"] || wb.Sheets[wb.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(ws, { defval: "", raw: false });
     const get = (r, k) => String(r[k] ?? "").trim();
-    const incoming = rows.map(r => ({ code: get(r, "교실코드"), grade: get(r, "학년"), cls: get(r, "반"), subject: get(r, "교과"), unit: get(r, "단원"), title: get(r, "수업 주제"),
+    const incoming = rows.map(r => ({ code: get(r, "교실코드"), grade: get(r, "학년"), cls: get(r, "반"), subject: get(r, "초학문적 주제") || get(r, "교과"), unit: get(r, "탐구 단원") || get(r, "단원"),
+      stage: get(r, "탐구 단계"), period: get(r, "차시"), title: get(r, "탐구 주제") || get(r, "수업 주제"),
       teacher: get(r, "수업자"), place: get(r, "장소"), point: get(r, "참관 포인트"), link: get(r, "수업안 링크") || get(r, "수업안 파일"), open: !/^(x|n|no|아니오|비공개)$/i.test(get(r, "공개")) }))
       .filter(r => /^\d-\d+$/.test(r.code));
     if (!incoming.length){ toast("'교실코드' 칸이 있는 엑셀인지 확인해 주세요."); return; }
@@ -410,7 +412,7 @@ $("#filSave").onclick = async () => {
 let SEAL = "", sealOld = "";
 function renderSettings(){
   const s = C.settings.data, f = $("#setForm");
-  ["RESEARCH_TOPIC","RESEARCH_SUB","EVENT_DATE","EVENT_DATE_LABEL","SCHEDULE_NOTE","REGISTER_URL","CERT_TITLE","CERT_SIGNER","CERT_BODY"].forEach(k => f.elements[k].value = s[k] || "");
+  ["RESEARCH_TOPIC","RESEARCH_SUB","EVENT_DATE","EVENT_DATE_LABEL","SCHEDULE_NOTE","RESEARCH_TASKS","REGISTER_URL","CERT_TITLE","CERT_SIGNER","CERT_BODY"].forEach(k => f.elements[k].value = s[k] || "");
   f.elements.HERO_BADGES.value = (s.HERO_BADGES || []).join("\n");
   f.querySelectorAll('[name="REGISTER_OPEN"]').forEach(r => r.checked = r.value === String(s.REGISTER_OPEN !== false));
   f.querySelectorAll('[name="CHECKIN_MODE"]').forEach(r => r.checked = r.value === (s.CHECKIN_MODE || "closed"));
@@ -425,7 +427,7 @@ $("#sealIn").onchange = async e => {
 $("#sealDel").onclick = () => { sealOld = SEAL; SEAL = ""; drawSeal(); $("#setDirty").hidden = false; };
 $("#setForm").addEventListener("submit", async e => {
   e.preventDefault(); const f = e.target, v = {};
-  ["RESEARCH_TOPIC","RESEARCH_SUB","EVENT_DATE","EVENT_DATE_LABEL","SCHEDULE_NOTE","REGISTER_URL","CERT_TITLE","CERT_SIGNER","CERT_BODY"].forEach(k => v[k] = f.elements[k].value.trim());
+  ["RESEARCH_TOPIC","RESEARCH_SUB","EVENT_DATE","EVENT_DATE_LABEL","SCHEDULE_NOTE","RESEARCH_TASKS","REGISTER_URL","CERT_TITLE","CERT_SIGNER","CERT_BODY"].forEach(k => v[k] = f.elements[k].value.trim());
   v.HERO_BADGES = f.elements.HERO_BADGES.value.split("\n").map(x => x.trim()).filter(Boolean);
   v.REGISTER_OPEN = (f.querySelector('[name="REGISTER_OPEN"]:checked') || {}).value !== "false";
   v.CHECKIN_MODE = (f.querySelector('[name="CHECKIN_MODE"]:checked') || {}).value || "closed";
