@@ -24,7 +24,7 @@ const REST = SBURL ? SBURL + "/rest/v1/" : "";
 const KEY = BASE.SUPABASE_KEY || "";
 
 /* 층 정보 (3D 배치도 기준) */
-const FLOOR_EXTRA = { 1: "중앙현관, 시청각실, 교무실", 2: "도서관, 체육관", 3: "컴퓨터실, SW미래교실", 4: "과학실", 5: "음악실, 옥상텃밭" };
+const FLOOR_EXTRA = { 1: "중앙현관, 교무실, 행정실", 2: "강당(보고회장), 도서관", 3: "컴퓨터실, SW미래교실", 4: "과학실", 5: "음악실, 옥상텃밭" };
 const floorOf = c => c.floor || ((c.place || "").match(/(\d)\s*층/) || [])[1] || "";
 
 /* ---------- 파일 주소 ---------- */
@@ -78,7 +78,7 @@ function checkinOpen(){
 const NAV = [
   ["classes.html", "공개수업"],
   ["index.html#schedule", "당일 일정"],
-  ["campus.html", "주차 · 학교 공간"],
+  ["campus.html", "학교 공간"],
   ["checkin.html", "참관 확인"],
 ];
 function registerHtml(){
@@ -177,12 +177,21 @@ async function openClassModal(code, room){
   modal.querySelector(".sheet").dataset.floor = fl;
   $("#cmPlate").textContent = isClass ? code : (fl ? fl + "층" : "");
   $("#cmPlate").hidden = !$("#cmPlate").textContent;
-  $("#cmTag").innerHTML = c ? [c.grade && c.cls ? `${c.grade}학년 ${c.cls}반` : "", c.subject].filter(Boolean).map(t => `<span>${esc(t)}</span>`).join("")
+  $("#cmTag").innerHTML = c ? [c.grade && c.cls ? `${c.grade}학년 ${c.cls}반` : "", c.unit ? `탐구 단원: ${c.unit}` : ""].filter(Boolean).map(t => `<span>${esc(t)}</span>`).join("")
                             : (fl ? `<span>${fl}층</span>` : "");
   $("#cmTitle").textContent = (c && c.title) || (isClass ? `${name} 교실` : name);
   let h = "";
-  if (c && (c.unit || c.teacher || c.place)){
-    h += `<dl class="facts">${[["단원", c.unit], ["수업자", c.teacher], ["장소", c.place]].filter(x => x[1]).map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`;
+  if (code === "강당"){                     // 3D 배치도의 '강당(보고회장)'
+    $("#cmPlate").textContent = "2층"; $("#cmPlate").hidden = false; modal.querySelector(".sheet").dataset.floor = "2";
+    $("#cmTag").innerHTML = `<span>보고회장</span>`; $("#cmTitle").textContent = "강당 (보고회장)";
+    const items = ((data && data.schedule) || []).filter(r => /강당|체육관/.test(r.where + r.what));
+    $("#cmBody").innerHTML = (items.length ? `<ol class="mini-tl">${items.map(r => `<li><b>${esc(r.start)}${r.end ? "~" + esc(r.end) : ""}</b><span>${esc(r.what)}</span></li>`).join("")}</ol>` : "")
+      + `<p class="muted">연구학교 운영 결과 공유와 질의응답이 이곳에서 열립니다.</p><a class="btn btn-line wide" href="index.html#schedule">전체 일정 보기</a>`;
+    lastFocus = document.activeElement; modal.hidden = false; document.body.style.overflow = "hidden"; $("#cmClose").focus();
+    return;
+  }
+  if (c && (c.subject || c.unit || c.stage || c.teacher || c.place)){
+    h += `<dl class="facts">${[["초학문적 주제", c.subject], ["탐구 단원", c.unit], ["탐구 단계", c.stage], ["차시", c.period], ["수업자", c.teacher], ["장소", c.place]].filter(x => x[1]).map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`;
   }
   if (c && c.point) h += `<div class="point"><b>참관 포인트</b><p>${esc(c.point)}</p></div>`;
   if (!c || !c.title) h += `<p class="muted">${esc(name)} 소개는 준비 중입니다.</p>`;

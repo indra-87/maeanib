@@ -148,7 +148,7 @@ img{max-width:100%;display:block}
 .sheet h2{font:1.65rem/1.3 var(--display)}
 .sheet-body{display:flex;flex-direction:column;gap:16px}
 .facts{display:grid;gap:6px}
-.facts div{display:grid;grid-template-columns:70px 1fr}
+.facts div{display:grid;grid-template-columns:100px 1fr;gap:8px}
 .facts dt{color:var(--ink-soft);font-size:.9rem}
 .point{background:var(--paper);border-radius:8px;padding:14px 18px}
 .point b{display:block;font-size:.85rem;margin-bottom:4px}
@@ -334,3 +334,18 @@ body.page-admin{background:#eef0f6}
 /* PC 버전 안내 띠 (휴대폰이 PC 화면으로 보고 있을 때만 나타남 · 크게 보이도록 글자를 키움) */
 .pc-hint{display:flex;align-items:center;gap:20px;background:#fff3cd;color:#5c4400;padding:28px 40px;font-size:34px;line-height:1.5;border-bottom:3px solid #e9a23b}
 .pc-hint button{border:0;background:none;font-size:40px;cursor:pointer;color:#5c4400;flex:none}
+
+/* 강당(보고회장) 소개 창의 짧은 일정 */
+.mini-tl{list-style:none;display:flex;flex-direction:column;gap:8px;border-left:3px solid var(--fc,var(--ink));padding-left:14px}
+.mini-tl li{display:flex;flex-direction:column}
+.mini-tl b{font:1.05rem var(--display)}
+/* 첫 화면: 연구 과제 */
+.tasks{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.task{background:#fff;border-radius:10px;padding:22px 22px 20px;box-shadow:0 0 0 1px var(--line);border-top:6px solid var(--fc)}
+.task .no{font:1rem var(--display);color:var(--ink-soft)}
+.task h3{font:1.3rem/1.35 var(--display);margin:4px 0 12px}
+.task ul{list-style:none;display:flex;flex-direction:column;gap:6px;font-size:.92rem;color:var(--ink-soft)}
+.task li{padding-left:14px;position:relative}
+.task li::before{content:"";position:absolute;left:0;top:.7em;width:6px;height:6px;border-radius:50%;background:var(--fc)}
+@media(max-width:860px){.tasks{grid-template-columns:1fr}}
+.room-body .stage{font-size:.74rem;font-weight:700;color:var(--ink-soft);background:var(--paper);border-radius:999px;padding:1px 8px;align-self:flex-start}
