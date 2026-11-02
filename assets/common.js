@@ -86,7 +86,20 @@ function registerHtml(){
     return `<a class="btn btn-act" href="${esc(CFG.REGISTER_URL)}" target="_blank" rel="noopener noreferrer">참관 신청<span class="sr-only"> (새 창)</span></a>`;
   return `<span class="btn btn-off">${CFG.REGISTER_URL ? "참관 신청 마감" : "참관 신청 준비 중"}</span>`;
 }
+/* 휴대폰인데 브라우저가 'PC 버전'으로 보여 주고 있으면 (화면이 작게 축소되어 보임) 안내 띠를 띄웁니다 */
+function pcModeHint(){
+  try {
+    const small = Math.min(screen.width, screen.height) < 700, touch = matchMedia("(pointer: coarse)").matches || navigator.maxTouchPoints > 0;
+    if (!(small && touch && innerWidth > 900) || sessionStorage.getItem("maean-pc-hint")) return;
+    const d = document.createElement("div"); d.className = "pc-hint"; d.setAttribute("role", "note");
+    d.innerHTML = `<span>지금 <b>PC 버전</b>으로 보고 있어 화면이 작게 보입니다. 브라우저 메뉴에서 <b>'PC 버전' 또는 '데스크톱 사이트'를 끄면</b> 휴대폰에 맞게 보입니다.</span><button type="button" aria-label="닫기">✕</button>`;
+    d.querySelector("button").onclick = () => { d.remove(); sessionStorage.setItem("maean-pc-hint", "1"); };
+    document.body.prepend(d);
+  } catch(e){}
+}
+
 function renderChrome(active){
+  pcModeHint();
   const h = document.createElement("header"); h.className = "top";
   h.innerHTML = `<div class="wrap top-in">
     <a class="brand" href="index.html" aria-label="${esc(BASE.SCHOOL_NAME)} 연구학교 보고회 첫 화면">

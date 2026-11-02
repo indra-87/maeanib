@@ -330,3 +330,7 @@ body.page-admin{background:#eef0f6}
 
 .page-checkin .sig-tools{justify-content:space-between;align-items:center;gap:10px}
 .page-checkin .sig-note{font-size:.78rem;color:var(--ink-soft)}
+
+/* PC 버전 안내 띠 (휴대폰이 PC 화면으로 보고 있을 때만 나타남 · 크게 보이도록 글자를 키움) */
+.pc-hint{display:flex;align-items:center;gap:20px;background:#fff3cd;color:#5c4400;padding:28px 40px;font-size:34px;line-height:1.5;border-bottom:3px solid #e9a23b}
+.pc-hint button{border:0;background:none;font-size:40px;cursor:pointer;color:#5c4400;flex:none}
