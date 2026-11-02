@@ -198,7 +198,7 @@ img{max-width:100%;display:block}
 .page-campus .legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:14px;font-size:.88rem;color:var(--ink-soft)}
 .page-campus .legend a{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink)}
 .page-campus .legend a i{width:14px;height:14px;border-radius:3px;background:var(--fc)}
-@media(max-width:600px){.page-campus .viewer{height:70vh;min-height:420px}}
+@media(max-width:600px){.page-campus .viewer{height:auto;min-height:0;aspect-ratio:10/9.5}}
 /* ===== checkin.html 전용 ===== */
 .page-checkin .ck-card{max-width:560px;margin:0 auto;padding:28px;background:#fff;border-radius:10px;box-shadow:0 0 0 1px var(--line)}
 .page-checkin .field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
