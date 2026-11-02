@@ -518,13 +518,14 @@ const REG_CSS = `
 .rg-page *{box-sizing:border-box;margin:0;padding:0}
 .rg-bar{display:flex;height:5px}
 .rg-bar i{display:block;height:100%}
-.rg-page h1{font-size:26px;font-weight:700;line-height:1.3;letter-spacing:-.02em;padding:12px 0 16px;color:#111}
+.rg-page h1{height:62px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:26px;font-weight:700;line-height:1;letter-spacing:-.02em;color:#111}
 .rg-info{list-style:none;margin:22px 0 14px;font-size:15px;line-height:1.85}
 .rg-info li::before{content:none!important}
 .rg-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:14px;border:1.5px solid #111}
-.rg-table th{height:38px;border:1px solid #111;border-bottom:2px solid #111;font-weight:700;text-align:center;vertical-align:middle}
-.rg-table td{height:auto;border:1px solid #111;text-align:center;vertical-align:middle;padding:0 6px;overflow:hidden;white-space:nowrap}
-.rg-table td.sg{padding:2px 8px}
+.rg-table th{height:38px;border:1px solid #111;border-bottom:2px solid #111;font-weight:700;text-align:center;vertical-align:middle;padding:0}
+.rg-table td{height:auto;border:1px solid #111;text-align:center;vertical-align:middle;padding:0;overflow:hidden;white-space:nowrap}
+.rg-table .cc{display:flex;align-items:center;justify-content:center;line-height:1;padding:0 6px;overflow:hidden}
+.rg-table td.sg{padding:0}
 .rg-table td.sg img{display:block;margin:0 auto;object-fit:contain}
 .rg-no{position:absolute;bottom:28px;left:0;right:0;text-align:center;font-size:12px;color:#555}
 `;
@@ -533,6 +534,56 @@ function regDefaults(){
   const s = C.settings.data;
   if (!$("#rgTitle").value) $("#rgTitle").value = localStorage.getItem("maean-rg-title") || `${s.RESEARCH_TOPIC || "매안초등학교 연구학교 보고회"} 참관 등록부`;
   if (!$("#rgInfo").value) $("#rgInfo").value = localStorage.getItem("maean-rg-info") ?? (s.EVENT_DATE_LABEL ? `일시 : ${s.EVENT_DATE_LABEL}` : "일시 : ");
+}
+function regModel(){
+  const per = +$("#rgPer").value, title = $("#rgTitle").value.trim(), info = $("#rgInfo").value.split("\n").map(x => x.trim()).filter(Boolean);
+  const pages = Math.max(1, Math.ceil(CK.length / per));
+  const rh = Math.floor((1123 - 112 - 150 - 28 * info.length - 38) / per);
+  return { per, title, info, pages, rh };
+}
+/* PDF용: 화면을 찍지 않고 캔버스에 직접 그림 → 제목·칸 안 글자가 정확히 가로·세로 가운데 */
+async function drawRegisterCanvas(p, m, sigImgs){
+  const S = 2.5, W = 794, Hh = 1123, c = document.createElement("canvas"); c.width = W * S; c.height = Hh * S;
+  const g = c.getContext("2d"); g.scale(S, S); g.fillStyle = "#fff"; g.fillRect(0, 0, W, Hh);
+  const FONT = '"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif';
+  const L = 60, R = W - 60, TW = R - L;
+  const center = (t, cx, cy, maxW, size, weight = 400) => {        // 실제 글자 높이를 재서 정가운데에
+    let s = size; g.font = `${weight} ${s}px ${FONT}`;
+    while (g.measureText(t).width > maxW && s > 8){ s -= .5; g.font = `${weight} ${s}px ${FONT}`; }
+    const mt = g.measureText(t), asc = mt.actualBoundingBoxAscent || s * .8, desc = mt.actualBoundingBoxDescent || s * .2;
+    g.textAlign = "center"; g.textBaseline = "alphabetic"; g.fillStyle = "#111"; g.fillText(t, cx, cy + (asc - desc) / 2);
+  };
+  const bar = (y, h, k, c1, c2) => { g.fillStyle = c1; g.fillRect(L, y, TW * k, h); g.fillStyle = c2; g.fillRect(L + TW * k, y, TW * (1 - k), h); };
+  let y = 56;
+  bar(y, 5, .18, "#111", "#2d4fd1"); y += 5;
+  center(m.title, W / 2, y + 31, TW, 26, 700); y += 62;
+  bar(y, 6, .14, "#dd5a84", "#111"); y += 6 + 22;
+  g.font = `400 15px ${FONT}`; g.textAlign = "left"; g.fillStyle = "#111";
+  m.info.forEach((t, i) => { const mt = g.measureText("□ " + t), a = mt.actualBoundingBoxAscent || 12, d = mt.actualBoundingBoxDescent || 3;
+    g.textBaseline = "alphabetic"; g.fillText("□ " + t, L, y + 14 + i * 28 + (a - d) / 2); });
+  y += 28 * m.info.length + 14;
+  const cols = [.14, .33, .23, .30].map(k => k * TW), xs = [L]; cols.forEach(w => xs.push(xs.at(-1) + w));
+  const top = y, headH = 38, n = m.per, bottom = top + headH + n * m.rh;
+  ["연번", "소속", "성명", "서 명"].forEach((t, i) => center(t, xs[i] + cols[i] / 2, top + headH / 2, cols[i] - 8, 14, 700));
+  for (let r = 0; r < n; r++){
+    const idx = p * n + r, ck = CK[idx], cy = top + headH + r * m.rh + m.rh / 2;
+    if (!ck) continue;
+    center(String(idx + 1), xs[0] + cols[0] / 2, cy, cols[0] - 12, 14);
+    center(ck.org, xs[1] + cols[1] / 2, cy, cols[1] - 12, 14);
+    center(ck.name, xs[2] + cols[2] / 2, cy, cols[2] - 12, 14);
+    const im = sigImgs[idx];
+    if (im && im.width){ const bw = cols[3] - 16, bh = m.rh - 8, k = Math.min(bw / im.width, bh / im.height);
+      const w = im.width * k, hh = im.height * k; g.drawImage(im, xs[3] + (cols[3] - w) / 2, cy - hh / 2, w, hh); }
+  }
+  g.strokeStyle = "#111"; g.lineWidth = 1;
+  g.beginPath();
+  for (let r = 1; r <= n; r++){ const yy = top + headH + r * m.rh; g.moveTo(L, yy); g.lineTo(R, yy); }
+  xs.slice(1, -1).forEach(x => { g.moveTo(x, top); g.lineTo(x, bottom); });
+  g.stroke();
+  g.lineWidth = 2; g.beginPath(); g.moveTo(L, top + headH); g.lineTo(R, top + headH); g.stroke();
+  g.lineWidth = 1.5; g.strokeRect(L, top, TW, bottom - top);
+  if (m.pages > 1){ g.font = `400 12px ${FONT}`; g.fillStyle = "#555"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(`${p + 1} / ${m.pages}`, W / 2, Hh - 34); }
+  return c;
 }
 function regPagesHtml(){
   const per = +$("#rgPer").value, title = $("#rgTitle").value.trim(), info = $("#rgInfo").value.split("\n").map(x => x.trim()).filter(Boolean);
@@ -544,14 +595,15 @@ function regPagesHtml(){
     const rows = [];
     for (let i = p * per; i < (p + 1) * per; i++){
       const c = CK[i];
-      rows.push(`<tr style="height:${rh}px"><td>${c ? i + 1 : ""}</td><td>${c ? esc(c.org) : ""}</td><td>${c ? esc(c.name) : ""}</td>
-        <td class="sg">${c && c.sig ? `<img src="${esc(c.sig)}" alt="" style="max-height:${rh - 6}px;max-width:100%">` : ""}</td></tr>`);
+      const cell = v => `<td><div class="cc" style="height:${rh - 1}px">${v}</div></td>`;   // 가로·세로 가운데
+      rows.push(`<tr style="height:${rh}px">${cell(c ? i + 1 : "")}${cell(c ? esc(c.org) : "")}${cell(c ? esc(c.name) : "")}
+        <td class="sg"><div class="cc" style="height:${rh - 1}px">${c && c.sig ? `<img src="${esc(c.sig)}" alt="" style="max-height:${rh - 8}px;max-width:100%">` : ""}</div></td></tr>`);
     }
     out.push(`<div class="rg-page">
       ${bar(["#111", 18], "#2d4fd1", 5)}<h1>${esc(title)}</h1>${bar(["#dd5a84", 14], "#111", 6)}
       <ul class="rg-info">${info.map(t => `<li>□ ${esc(t)}</li>`).join("")}</ul>
       <table class="rg-table"><colgroup><col style="width:14%"><col style="width:33%"><col style="width:23%"><col style="width:30%"></colgroup>
-        <thead><tr><th>연번</th><th>소속</th><th>성명</th><th>서 명</th></tr></thead><tbody>${rows.join("")}</tbody></table>
+        <thead><tr>${["연번","소속","성명","서 명"].map(t => `<th><div class="cc" style="height:36px">${t}</div></th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table>
       ${pages > 1 ? `<div class="rg-no">${p + 1} / ${pages}</div>` : ""}
     </div>`);
   }
@@ -571,17 +623,13 @@ $("#rgPdf").onclick = async () => {
   try {
     await document.fonts.ready;
     const pdf = new jspdf.jsPDF({ orientation: "p", unit: "mm", format: "a4" });
-    /* 미리보기(축소)와 별개로, 화면 밖에 실제 A4 크기로 그려서 찍습니다 */
-    const host = document.createElement("div"); host.id = "rgPrint"; host.innerHTML = regPagesHtml().out.join(""); document.body.append(host);
-    await Promise.all([...host.querySelectorAll("img")].map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r; })));
-    const pages = [...host.querySelectorAll(".rg-page")];
-    try {
-      for (let i = 0; i < pages.length; i++){
-        const cv = await html2canvas(pages[i], { scale: 2, backgroundColor: "#fff", width: 794, height: 1123, windowWidth: 1280 });
-        if (i) pdf.addPage();
-        pdf.addImage(cv.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, 210, 297);
-      }
-    } finally { host.remove(); }
+    const m = regModel();
+    const sigImgs = await Promise.all(CK.map(c => new Promise(res => { if (!c.sig) return res(null); const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = c.sig; })));
+    for (let p = 0; p < m.pages; p++){
+      const cv = await drawRegisterCanvas(p, m, sigImgs);
+      if (p) pdf.addPage();
+      pdf.addImage(cv.toDataURL("image/jpeg", 0.93), "JPEG", 0, 0, 210, 297);
+    }
     const day = (C.settings.data.EVENT_DATE || new Date().toISOString().slice(0, 10));
     pdf.save(`참관등록부_${day}.pdf`);
   } catch(err){ toast("PDF를 만들지 못했습니다: " + err.message); }
