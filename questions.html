@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>사전 질문 · 매안초등학교 연구학교 보고회</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/config.js"></script>
+<script src="assets/common.js"></script>
+</head>
+<body class="page-questions">
+
+<section class="band"><div class="wrap">
+  <h1>사전 질문</h1>
+  <p>매안초와 공개수업을 둘러보다 궁금한 점이 생기면 미리 남겨 주세요. 2층 강당 질의응답 시간에 참고합니다.</p>
+</div></section>
+
+<section class="sec" style="padding-top:30px">
+  <div class="wrap q-wrap">
+    <form class="q-form" id="qForm" autocomplete="off">
+      <div class="q-who">
+        <label><span>소속</span><input id="qOrg" maxlength="30" placeholder="선택"></label>
+        <label><span>이름</span><input id="qName" maxlength="15" placeholder="선택"></label>
+      </div>
+      <label class="q-text"><span>질문</span><textarea id="qText" maxlength="500" required placeholder="궁금한 점을 적어 주세요"></textarea></label>
+      <div class="q-foot"><small>소속과 이름을 비워 두면 <b>익명</b>으로 올라갑니다. 내가 쓴 질문은 이 기기에서 고치거나 지울 수 있습니다.</small>
+        <button class="btn btn-act" type="submit">질문 올리기</button></div>
+    </form>
+
+    <div class="q-head"><h2>올라온 질문 <span id="qCount"></span></h2><button class="btn btn-line" id="qReload" type="button">새로고침</button></div>
+    <ol class="q-list" id="qList"><li class="muted">불러오는 중…</li></ol>
+  </div>
+</section>
+
+<script>
+const { esc, rpc, newToken, lsGet, lsSet, REST, KEY, fmtTime, toast } = Maean;
+Maean.renderChrome("questions.html");
+const $ = id => document.getElementById(id);
+const MINE = "maean-q-mine";
+const mine = () => lsGet(MINE, {});
+const who = q => [q.org, q.name].filter(Boolean).join(" ") || "익명";
+let Q = [];
+
+/* 내가 지난번에 쓴 소속·이름 기억 (익명으로 쓰고 싶으면 지우면 됨) */
+$("qOrg").value = lsGet("maean-q-org", ""); $("qName").value = lsGet("maean-q-name", "");
+
+async function load(){
+  try {
+    const r = await fetch(REST + "maean_questions?select=id,created_at,updated_at,org,name,text&order=created_at.desc&limit=500", { headers: { apikey: KEY }, cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    Q = await r.json();
+  } catch(e){ $("qList").innerHTML = `<li class="muted">질문을 불러오지 못했습니다. 잠시 뒤 새로고침해 주세요.</li>`; return; }
+  draw();
+}
+function draw(){
+  const my = mine();
+  $("qCount").textContent = Q.length ? `${Q.length}개` : "";
+  $("qList").innerHTML = Q.length ? Q.map(q => `<li class="q-item" data-id="${q.id}">
+      <p class="q-body">${esc(q.text)}</p>
+      <div class="q-meta"><span class="q-by${who(q) === "익명" ? " anon" : ""}">${esc(who(q))}</span><span>${fmtTime(q.created_at)}${q.updated_at ? " (수정됨)" : ""}</span>
+        ${my[q.id] ? `<span class="own"><button type="button" data-a="edit">고치기</button><button type="button" data-a="del">지우기</button></span>` : ""}</div>
+    </li>`).join("") : `<li class="muted">아직 올라온 질문이 없습니다. 첫 질문을 남겨 주세요.</li>`;
+}
+$("qReload").onclick = load;
+
+$("qForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const text = $("qText").value.trim(); if (!text) return;
+  const org = $("qOrg").value.trim(), name = $("qName").value.trim(), btn = e.target.querySelector("button[type=submit]");
+  btn.disabled = true;
+  try {
+    const token = newToken();
+    const id = await rpc("maean_add_question", { p_org: org, p_name: name, p_text: text, p_token: token });
+    const m = mine(); m[id] = token; lsSet(MINE, m); lsSet("maean-q-org", org); lsSet("maean-q-name", name);
+    $("qText").value = ""; toast(org || name ? "질문을 올렸습니다." : "익명으로 질문을 올렸습니다."); await load();
+  } catch(err){ toast("올리지 못했습니다. 잠시 뒤 다시 시도해 주세요."); }
+  btn.disabled = false;
+});
+
+$("qList").addEventListener("click", async e => {
+  const b = e.target.closest("button[data-a]"); if (!b) return;
+  const li = b.closest("li"), id = Number(li.dataset.id), q = Q.find(x => x.id === id), a = b.dataset.a, token = mine()[id] || "";
+  if (a === "edit"){
+    li.innerHTML = `<form class="q-edit">
+      <div class="q-who"><label><span>소속</span><input name="org" maxlength="30" value="${esc(q.org)}" placeholder="선택"></label>
+        <label><span>이름</span><input name="name" maxlength="15" value="${esc(q.name)}" placeholder="선택"></label></div>
+      <label class="q-text"><span>질문</span><textarea name="text" maxlength="500" required>${esc(q.text)}</textarea></label>
+      <div class="q-foot"><span></span><span><button class="btn btn-line" type="button" data-a="cancel">취소</button> <button class="btn btn-act" type="submit">저장</button></span></div></form>`;
+    li.querySelector("textarea").focus();
+    li.querySelector("form").addEventListener("submit", async ev => {
+      ev.preventDefault(); const f = ev.target, text = f.text.value.trim(); if (!text) return;
+      try { toast((await rpc("maean_update_question", { p_id: id, p_token: token, p_org: f.org.value.trim(), p_name: f.name.value.trim(), p_text: text })) ? "질문을 고쳤습니다." : "이 질문은 고칠 수 없습니다."); }
+      catch(err){ toast("고치지 못했습니다. 잠시 뒤 다시 시도해 주세요."); }
+      load();
+    });
+  } else if (a === "cancel") draw();
+  else if (a === "del") li.querySelector(".own").innerHTML = `<span class="ask">지울까요?</span><button type="button" data-a="del-yes">지우기</button><button type="button" data-a="cancel">취소</button>`;
+  else if (a === "del-yes"){
+    try {
+      if (await rpc("maean_delete_question", { p_id: id, p_token: token })){ const m = mine(); delete m[id]; lsSet(MINE, m); toast("질문을 지웠습니다."); }
+      else toast("이 질문은 지울 수 없습니다.");
+    } catch(err){ toast("지우지 못했습니다. 잠시 뒤 다시 시도해 주세요."); }
+    load();
+  }
+});
+load();
+</script>
+</body>
+</html>

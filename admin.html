@@ -61,7 +61,7 @@
     <!-- 사이트 설정 -->
     <section class="pane" data-tab="settings" hidden>
       <h2>사이트 설정</h2>
-      <p class="desc">참관 신청 링크, 참관 확인 열기/닫기, 참관증 문구 등을 정합니다.</p>
+      <p class="desc">첫 화면 문구, 연구 과제, 참관 확인 열기/닫기, 참관증 문구 등을 정합니다.</p>
       <form id="setForm">
         <h3 style="font:1.2rem var(--display);margin:6px 0 10px">첫 화면</h3>
         <label class="f"><span>연구 주제 (큰 제목)</span><input type="text" name="RESEARCH_TOPIC"><small>비워 두면 '매안초등학교 연구학교 보고회'가 보입니다.</small></label>
@@ -73,12 +73,6 @@
         <label class="f"><span>추가 안내 (한 줄에 하나)</span><textarea name="HERO_BADGES" style="min-height:60px" placeholder="공개수업 41학급&#10;등록 13:30부터"></textarea></label>
         <label class="f"><span>일정 아래 안내 문구</span><input type="text" name="SCHEDULE_NOTE"></label>
         <label class="f"><span>연구 과제</span><textarea name="RESEARCH_TASKS" style="min-height:220px" placeholder="교육공동체가 함께 만들어가는 IB PYP 실행 기반 조성&#10;협의회 정례화를 통한 …&#10;&#10;(빈 줄) 다음 과제 제목&#10;…"></textarea><small>과제마다 빈 줄로 구분합니다. 첫 줄은 과제 제목, 다음 줄부터 세부 내용입니다. 비워 두면 첫 화면에 나오지 않습니다.</small></label>
-
-        <h3 style="font:1.2rem var(--display);margin:18px 0 10px">참관 신청</h3>
-        <label class="f"><span>참관 신청 링크</span><input type="url" name="REGISTER_URL" placeholder="https://forms.gle/…"></label>
-        <div class="f"><span>신청 받기</span><div class="radios">
-          <label><input type="radio" name="REGISTER_OPEN" value="true"><span>받는 중</span></label>
-          <label><input type="radio" name="REGISTER_OPEN" value="false"><span>마감</span></label></div></div>
 
         <h3 style="font:1.2rem var(--display);margin:18px 0 10px">참관 확인 · 참관증</h3>
         <div class="f"><span>참관 확인 화면</span><div class="radios">
@@ -106,6 +100,14 @@
       <p class="desc">숨기면 사이트에서 보이지 않습니다. 지우면 되돌릴 수 없습니다.</p>
       <div class="bar"><select id="cmRoom" class="f" style="margin:0;padding:8px;border:1.5px solid var(--line);border-radius:7px;font:inherit"></select><button class="btn btn-line" id="cmReload">새로고침</button></div>
       <div class="tblwrap"><table class="list" id="cmTable"></table></div>
+    </section>
+
+    <!-- 사전 질문 -->
+    <section class="pane" data-tab="questions" hidden>
+      <h2>사전 질문</h2>
+      <p class="desc">참관자들이 올린 질문입니다. 질의응답 시간 전에 엑셀로 받아 정리할 수 있고, 부적절한 질문은 지울 수 있습니다. 지우면 되돌릴 수 없습니다.</p>
+      <div class="bar"><b id="qaCount"></b><span class="sp"></span><button class="btn btn-line" id="qaReload">새로고침</button><button class="btn btn-act" id="qaCsv">엑셀(CSV)로 내려받기</button></div>
+      <div class="tblwrap"><table class="list" id="qaTable"></table></div>
     </section>
 
     <!-- 참관자 명단 -->
@@ -235,7 +237,7 @@ async function enter(){
 if (PW) enter();
 
 /* ---------- 탭 ---------- */
-const TABS = [["classes","수업 소개"],["schedule","당일 일정"],["files","자료실"],["settings","사이트 설정"],["comments","소감 관리"],["checkins","참관자 명단"],["password","비밀번호"]];
+const TABS = [["classes","수업 소개"],["schedule","당일 일정"],["files","자료실"],["settings","사이트 설정"],["comments","소감 관리"],["questions","사전 질문"],["checkins","참관자 명단"],["password","비밀번호"]];
 $("#tabs").innerHTML = TABS.map(([k, t]) => `<button role="tab" data-k="${k}">${t}</button>`).join("");
 $("#tabs").onclick = e => { const b = e.target.closest("button"); if (b) showTab(b.dataset.k); };
 function showTab(k){
@@ -245,6 +247,7 @@ function showTab(k){
   history.replaceState(null, "", "#" + k);
   if (k === "comments") loadComments();
   if (k === "checkins") loadCheckins();
+  if (k === "questions") loadQuestions();
 }
 function renderAll(){ renderClasses(); renderSchedule(); renderFiles(); renderSettings(); }
 
@@ -412,9 +415,8 @@ $("#filSave").onclick = async () => {
 let SEAL = "", sealOld = "";
 function renderSettings(){
   const s = C.settings.data, f = $("#setForm");
-  ["RESEARCH_TOPIC","RESEARCH_SUB","EVENT_DATE","EVENT_DATE_LABEL","SCHEDULE_NOTE","RESEARCH_TASKS","REGISTER_URL","CERT_TITLE","CERT_SIGNER","CERT_BODY"].forEach(k => f.elements[k].value = s[k] || "");
+  ["RESEARCH_TOPIC","RESEARCH_SUB","EVENT_DATE","EVENT_DATE_LABEL","SCHEDULE_NOTE","RESEARCH_TASKS","CERT_TITLE","CERT_SIGNER","CERT_BODY"].forEach(k => f.elements[k].value = s[k] || "");
   f.elements.HERO_BADGES.value = (s.HERO_BADGES || []).join("\n");
-  f.querySelectorAll('[name="REGISTER_OPEN"]').forEach(r => r.checked = r.value === String(s.REGISTER_OPEN !== false));
   f.querySelectorAll('[name="CHECKIN_MODE"]').forEach(r => r.checked = r.value === (s.CHECKIN_MODE || "closed"));
   SEAL = s.SEAL || ""; sealOld = ""; drawSeal(); $("#setDirty").hidden = true;
 }
@@ -427,9 +429,8 @@ $("#sealIn").onchange = async e => {
 $("#sealDel").onclick = () => { sealOld = SEAL; SEAL = ""; drawSeal(); $("#setDirty").hidden = false; };
 $("#setForm").addEventListener("submit", async e => {
   e.preventDefault(); const f = e.target, v = {};
-  ["RESEARCH_TOPIC","RESEARCH_SUB","EVENT_DATE","EVENT_DATE_LABEL","SCHEDULE_NOTE","RESEARCH_TASKS","REGISTER_URL","CERT_TITLE","CERT_SIGNER","CERT_BODY"].forEach(k => v[k] = f.elements[k].value.trim());
+  ["RESEARCH_TOPIC","RESEARCH_SUB","EVENT_DATE","EVENT_DATE_LABEL","SCHEDULE_NOTE","RESEARCH_TASKS","CERT_TITLE","CERT_SIGNER","CERT_BODY"].forEach(k => v[k] = f.elements[k].value.trim());
   v.HERO_BADGES = f.elements.HERO_BADGES.value.split("\n").map(x => x.trim()).filter(Boolean);
-  v.REGISTER_OPEN = (f.querySelector('[name="REGISTER_OPEN"]:checked') || {}).value !== "false";
   v.CHECKIN_MODE = (f.querySelector('[name="CHECKIN_MODE"]:checked') || {}).value || "closed";
   v.SEAL = SEAL;
   if (v.CHECKIN_MODE === "auto" && !v.EVENT_DATE){ toast("'당일 자동'을 쓰려면 보고회 날짜를 정해 주세요."); return; }
@@ -462,6 +463,37 @@ $("#cmTable").onclick = async e => {
     else await rpc("maean_admin_comment_set", { p_id: id, p_hidden: a === "hide" });
     await loadComments();
   } catch(err){ toast(err.message); }
+};
+
+/* ---------- 사전 질문 ---------- */
+let QA = [];
+async function loadQuestions(){
+  $("#qaTable").innerHTML = `<tr><td class="muted">불러오는 중…</td></tr>`;
+  try { QA = (await rpc("maean_admin_questions")).items || []; } catch(e){ toast(e.message); return; }
+  drawQuestions();
+}
+function drawQuestions(){
+  $("#qaCount").textContent = `${QA.length}개`;
+  $("#qaTable").innerHTML = QA.length ? `<thead><tr><th>번호</th><th>질문</th><th>소속</th><th>이름</th><th>시간</th><th></th></tr></thead><tbody>` + QA.map((q, i) => `<tr data-id="${q.id}">
+      <td>${i + 1}</td><td style="white-space:pre-line;min-width:240px">${esc(q.text)}${q.edited ? ' <span class="no">(수정됨)</span>' : ""}</td>
+      <td>${esc(q.org) || '<span class="no">-</span>'}</td><td>${esc(q.name) || '<span class="no">익명</span>'}</td>
+      <td style="white-space:nowrap">${fmtT(q.t)}</td><td class="row-acts"><button class="btn btn-line danger" data-a="del">지우기</button></td></tr>`).join("") + "</tbody>"
+    : `<tr><td class="muted">아직 올라온 질문이 없습니다.</td></tr>`;
+}
+$("#qaReload").onclick = loadQuestions;
+$("#qaTable").onclick = async e => {
+  const b = e.target.closest("button[data-a]"); if (!b) return;
+  const tr = b.closest("tr"), id = +tr.dataset.id;
+  if (b.dataset.a === "del") tr.querySelector(".row-acts").innerHTML = `<span class="ask">지울까요?</span><button class="btn btn-line danger" data-a="del-yes">지우기</button><button class="btn btn-line" data-a="cancel">취소</button>`;
+  else if (b.dataset.a === "cancel") drawQuestions();
+  else if (b.dataset.a === "del-yes"){
+    try { await rpc("maean_admin_question_delete", { p_id: id }); QA = QA.filter(q => q.id !== id); drawQuestions(); toast("질문을 지웠습니다."); } catch(err){ toast(err.message); }
+  }
+};
+$("#qaCsv").onclick = () => {
+  const q = s => `"${String(s ?? "").replace(/"/g, '""')}"`;
+  const csv = "\ufeff" + [["번호","질문","소속","이름","시간"], ...QA.map((x, i) => [i + 1, x.text, x.org, x.name || "익명", new Date(x.t).toLocaleString("ko-KR")])].map(r => r.map(q).join(",")).join("\r\n");
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = "사전질문.csv"; a.click();
 };
 
 /* ---------- 참관자 명단 ---------- */
