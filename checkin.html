@@ -52,7 +52,9 @@
         <h1 id="cTitle"></h1>
         <dl class="info">
           <dt>소속</dt><dd id="cOrg"></dd>
-          <dt>성명</dt><dd><span id="cName"></span><span class="sig-lbl">(서명)</span><img class="sig-img" id="cSig" alt="서명"></dd>
+          <dt>성명</dt><dd><span id="cName"></span>
+            <!-- 손 서명을 '(서명)' 글자 위에 겹쳐 표시 -->
+            <span id="sigSpot" style="position:relative;display:inline-block;margin-left:auto;margin-right:26mm;font-size:11pt;color:#555;line-height:1">(서명)<img id="cSig" alt="서명" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:none;pointer-events:none"></span></dd>
         </dl>
         <div class="body" id="cBody"></div>
         <div class="date" id="cDate"></div>
@@ -106,6 +108,13 @@ function trimmedSignature(){
   return c.toDataURL("image/png");
 }
 
+/* 참관증 서명: 가로 45mm × 세로 17mm 안에 비율 그대로 맞춤 (PDF로 저장해도 찌그러지지 않게 크기를 직접 정함) */
+function fitSignature(img, src){
+  const MM = 96 / 25.4, W = 45 * MM, H = 17 * MM, probe = new Image();
+  probe.onload = () => { const k = Math.min(W / probe.width, H / probe.height); img.style.width = probe.width * k + "px"; img.style.height = probe.height * k + "px"; img.src = src; };
+  probe.src = src;
+}
+
 /* 등록부 보관용: 서명을 높이 90px 이하로 줄여 저장 (보통 5~15KB) */
 function smallSignature(src){
   return new Promise(res => {
@@ -147,7 +156,7 @@ $("ckForm").addEventListener("submit", e => {
   $("cTitle").textContent = CFG.CERT_TITLE || "참 관 증";
   $("cOrg").textContent = org; $("cName").textContent = name;
   const sigFull = trimmedSignature();
-  $("cSig").src = sigFull;
+  fitSignature($("cSig"), sigFull);
   $("cBody").textContent = CFG.CERT_BODY || "";
   $("cDate").textContent = today();
   $("cSigner").textContent = CFG.CERT_SIGNER || "";
