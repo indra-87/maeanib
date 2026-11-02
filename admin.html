@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>편집 · 매안초등학교 연구학교 보고회</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  body{background:#eef0f6}
+  .ad-top{background:var(--ink);color:#fff}
+  .ad-top .wrap{display:flex;align-items:center;gap:14px;min-height:60px}
+  .ad-top b{font:1.25rem var(--display)}
+  .ad-top a,.ad-top button{margin-left:auto;color:#c9cee6;font:600 .88rem var(--body);background:none;border:0;cursor:pointer}
+  .ad-top button{margin-left:14px}
+  .login{max-width:400px;margin:12vh auto;background:#fff;border-radius:10px;padding:30px;box-shadow:0 0 0 1px var(--line)}
+  .login h1{font:1.8rem var(--display);margin-bottom:6px}
+  .tabs{display:flex;gap:2px;overflow-x:auto;border-bottom:2px solid var(--ink);margin:26px 0 22px}
+  .tabs button{font:600 .95rem var(--body);background:none;border:0;padding:10px 14px;cursor:pointer;color:var(--ink-soft);white-space:nowrap;border-radius:6px 6px 0 0}
+  .tabs button[aria-selected="true"]{background:var(--ink);color:#fff}
+  .pane{background:#fff;border-radius:10px;padding:24px;box-shadow:0 0 0 1px var(--line);margin-bottom:40px}
+  .pane h2{font:1.5rem var(--display);margin-bottom:4px}
+  .pane .desc{color:var(--ink-soft);font-size:.92rem;margin-bottom:18px}
+  .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px}
+  .bar .sp{flex:1}
+  label.btn input[type=file]{display:none}
+  .f{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+  .f>span{font-weight:600;font-size:.9rem}
+  .f small{color:var(--ink-soft);font-size:.8rem}
+  .f input[type=text],.f input[type=url],.f input[type=date],.f input[type=password],.f textarea,.f select,.grid-in input{font:inherit;font-size:.95rem;padding:9px 11px;border:1.5px solid var(--line);border-radius:7px;background:#fff;width:100%}
+  .f textarea{min-height:90px;resize:vertical}
+  .f input:focus,.f textarea:focus,.grid-in input:focus{border-color:var(--act);outline:none}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+  @media(max-width:640px){.two{grid-template-columns:1fr}}
+  .radios{display:flex;flex-wrap:wrap;gap:8px}
+  .radios label{display:flex;gap:6px;align-items:center;border:1.5px solid var(--line);border-radius:7px;padding:8px 12px;cursor:pointer;font-size:.92rem}
+  .radios input:checked+span{font-weight:700}
+  table.list{width:100%;border-collapse:collapse;font-size:.9rem}
+  table.list th{text-align:left;font-weight:600;color:var(--ink-soft);font-size:.8rem;padding:8px;border-bottom:2px solid var(--ink)}
+  table.list td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+  table.list tr.click{cursor:pointer}
+  table.list tr.click:hover td{background:#f6f7fb}
+  .tag{display:inline-block;font:1rem/1 var(--display);background:var(--fc,#ccc);padding:5px 8px;border-radius:5px}
+  .ok{color:#2b8a5a;font-weight:600}.no{color:#9aa0b8}
+  .tblwrap{overflow-x:auto}
+  .grid-in{display:grid;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+  .grid-in.sch{grid-template-columns:90px 90px 1fr 1fr auto}
+  .grid-in.fil{grid-template-columns:110px 1fr 1.2fr 1fr auto}
+  .grid-in .acts{display:flex;gap:2px}
+  .grid-in .acts button{border:0;background:var(--paper);border-radius:5px;width:30px;height:30px;cursor:pointer}
+  .grid-in .filecell{display:flex;gap:6px;align-items:center;font-size:.84rem;min-width:0}
+  .grid-in .filecell span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  @media(max-width:760px){.grid-in.sch,.grid-in.fil{grid-template-columns:1fr 1fr}.grid-in .acts{grid-column:1/-1}}
+  .log{margin-top:12px;font-size:.86rem;display:flex;flex-direction:column;gap:3px}
+  .seal-prev{width:90px;height:90px;object-fit:contain;border:1px dashed var(--line);border-radius:6px;background:#fff}
+  .help{background:var(--paper);border-radius:8px;padding:14px 16px;font-size:.88rem;color:var(--ink-soft);margin-top:16px}
+  .help b{color:var(--ink)}
+  .err{color:#c8423b;font-size:.9rem;min-height:1.3em;margin-top:6px}
+  .badge-dirty{font-size:.82rem;color:#c8423b;font-weight:600}
+</style>
+</head>
+<body>
+<header class="ad-top"><div class="wrap"><b>보고회 안내 편집</b><a href="index.html" target="_blank" rel="noopener">사이트 보기</a><button id="logout" hidden>나가기</button></div></header>
+
+<main class="wrap">
+  <form class="login" id="loginView">
+    <h1>편집하기</h1>
+    <p class="muted" style="margin-bottom:18px">함께 쓰는 편집 비밀번호를 입력하세요.</p>
+    <label class="f"><span>비밀번호</span><input type="password" id="pw" autocomplete="current-password" required></label>
+    <button class="btn btn-act wide" type="submit">들어가기</button>
+    <p class="err" id="loginErr" role="alert"></p>
+  </form>
+
+  <div id="app" hidden>
+    <nav class="tabs" role="tablist" id="tabs"></nav>
+
+    <!-- 수업 소개 -->
+    <section class="pane" data-tab="classes" hidden>
+      <h2>수업 소개</h2>
+      <p class="desc">교실을 누르면 내용을 고칠 수 있고, 저장하면 바로 사이트에 반영됩니다. 엑셀로 한꺼번에 고치거나, 수업안 PDF를 여러 개 한꺼번에 올릴 수도 있습니다.</p>
+      <div class="bar">
+        <button class="btn btn-line" id="xlsxOut">엑셀로 내려받기</button>
+        <label class="btn btn-line">엑셀 불러오기<input type="file" id="xlsxIn" accept=".xlsx,.xls"></label>
+        <label class="btn btn-act">수업안 PDF 한꺼번에 올리기<input type="file" id="pdfBulk" accept=".pdf,application/pdf" multiple></label>
+      </div>
+      <div class="log" id="bulkLog"></div>
+      <div class="tblwrap"><table class="list" id="classTable"></table></div>
+      <div class="help"><b>PDF 한꺼번에 올리기:</b> 파일 이름에 교실 번호가 들어 있으면 자동으로 그 교실에 연결됩니다. 예: <b>1-1.pdf</b>, <b>3-2 수업안.pdf</b>, <b>수업안_5-9.pdf</b><br>
+      <b>엑셀:</b> '엑셀로 내려받기'로 받은 파일을 고친 뒤 '엑셀 불러오기'로 올리면 됩니다. 교실코드 칸은 바꾸지 마세요.</div>
+    </section>
+
+    <!-- 당일 일정 -->
+    <section class="pane" data-tab="schedule" hidden>
+      <h2>당일 일정</h2>
+      <p class="desc">위에서부터 순서대로 첫 화면에 보입니다.</p>
+      <div id="schRows"></div>
+      <div class="bar" style="margin-top:14px"><button class="btn btn-line" id="schAdd">일정 추가</button><span class="sp"></span><span class="badge-dirty" id="schDirty" hidden>저장하지 않은 변경이 있습니다</span><button class="btn btn-act" id="schSave">일정 저장</button></div>
+    </section>
+
+    <!-- 자료실 -->
+    <section class="pane" data-tab="files" hidden>
+      <h2>자료실</h2>
+      <p class="desc">연구보고서 등 내려받을 자료입니다. 파일을 올리거나, 구글 드라이브 등의 링크(https://…)를 적을 수 있습니다. 한 줄이라도 있으면 첫 화면에 자료실이 나타납니다.</p>
+      <div id="filRows"></div>
+      <div class="bar" style="margin-top:14px"><button class="btn btn-line" id="filAdd">자료 추가</button><span class="sp"></span><span class="badge-dirty" id="filDirty" hidden>저장하지 않은 변경이 있습니다</span><button class="btn btn-act" id="filSave">자료실 저장</button></div>
+    </section>
+
+    <!-- 사이트 설정 -->
+    <section class="pane" data-tab="settings" hidden>
+      <h2>사이트 설정</h2>
+      <p class="desc">참관 신청 링크, 참관 확인 열기/닫기, 참관증 문구 등을 정합니다.</p>
+      <form id="setForm">
+        <h3 style="font:1.2rem var(--display);margin:6px 0 10px">첫 화면</h3>
+        <label class="f"><span>연구 주제 (큰 제목)</span><input type="text" name="RESEARCH_TOPIC"><small>비워 두면 '매안초등학교 연구학교 보고회'가 보입니다.</small></label>
+        <label class="f"><span>소개 문장</span><input type="text" name="RESEARCH_SUB"></label>
+        <div class="two">
+          <label class="f"><span>보고회 날짜</span><input type="date" name="EVENT_DATE"><small>참관 확인 '당일 자동'에 쓰입니다.</small></label>
+          <label class="f"><span>화면에 보일 날짜</span><input type="text" name="EVENT_DATE_LABEL" placeholder="2026. 11. 20.(금)"></label>
+        </div>
+        <label class="f"><span>추가 안내 (한 줄에 하나)</span><textarea name="HERO_BADGES" style="min-height:60px" placeholder="공개수업 41학급&#10;등록 13:30부터"></textarea></label>
+        <label class="f"><span>일정 아래 안내 문구</span><input type="text" name="SCHEDULE_NOTE"></label>
+
+        <h3 style="font:1.2rem var(--display);margin:18px 0 10px">참관 신청</h3>
+        <label class="f"><span>참관 신청 링크</span><input type="url" name="REGISTER_URL" placeholder="https://forms.gle/…"></label>
+        <div class="f"><span>신청 받기</span><div class="radios">
+          <label><input type="radio" name="REGISTER_OPEN" value="true"><span>받는 중</span></label>
+          <label><input type="radio" name="REGISTER_OPEN" value="false"><span>마감</span></label></div></div>
+
+        <h3 style="font:1.2rem var(--display);margin:18px 0 10px">참관 확인 · 참관증</h3>
+        <div class="f"><span>참관 확인 화면</span><div class="radios">
+          <label><input type="radio" name="CHECKIN_MODE" value="auto"><span>보고회 날짜에만 자동으로 열기</span></label>
+          <label><input type="radio" name="CHECKIN_MODE" value="open"><span>지금 열기</span></label>
+          <label><input type="radio" name="CHECKIN_MODE" value="closed"><span>닫기</span></label></div></div>
+        <div class="two">
+          <label class="f"><span>참관증 제목</span><input type="text" name="CERT_TITLE"></label>
+          <label class="f"><span>발급자</span><input type="text" name="CERT_SIGNER"></label>
+        </div>
+        <label class="f"><span>참관증 본문</span><textarea name="CERT_BODY" placeholder="위 사람은 …"></textarea></label>
+        <div class="f"><span>학교장 직인 이미지</span>
+          <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+            <img class="seal-prev" id="sealPrev" alt="직인 미리보기" hidden>
+            <label class="btn btn-line">이미지 올리기<input type="file" id="sealIn" accept="image/png,image/jpeg,image/webp"></label>
+            <button type="button" class="btn btn-line" id="sealDel" hidden>지우기</button>
+          </div><small>배경이 투명한 PNG가 가장 깔끔합니다.</small></div>
+        <div class="bar" style="margin-top:10px"><span class="sp"></span><span class="badge-dirty" id="setDirty" hidden>저장하지 않은 변경이 있습니다</span><button class="btn btn-act" type="submit">설정 저장</button></div>
+      </form>
+    </section>
+
+    <!-- 소감 관리 -->
+    <section class="pane" data-tab="comments" hidden>
+      <h2>소감 관리</h2>
+      <p class="desc">숨기면 사이트에서 보이지 않습니다. 지우면 되돌릴 수 없습니다.</p>
+      <div class="bar"><select id="cmRoom" class="f" style="margin:0;padding:8px;border:1.5px solid var(--line);border-radius:7px;font:inherit"></select><button class="btn btn-line" id="cmReload">새로고침</button></div>
+      <div class="tblwrap"><table class="list" id="cmTable"></table></div>
+    </section>
+
+    <!-- 참관자 명단 -->
+    <section class="pane" data-tab="checkins" hidden>
+      <h2>참관자 명단</h2>
+      <p class="desc">참관증을 받은 분들의 소속과 이름입니다. 서명 이미지는 저장하지 않습니다.</p>
+      <div class="bar"><b id="ckCount"></b><span class="sp"></span><button class="btn btn-line" id="ckReload">새로고침</button><button class="btn btn-act" id="ckCsv">엑셀(CSV)로 내려받기</button></div>
+      <div class="tblwrap"><table class="list" id="ckTable"></table></div>
+    </section>
+
+    <!-- 비밀번호 -->
+    <section class="pane" data-tab="password" hidden>
+      <h2>비밀번호 바꾸기</h2>
+      <p class="desc">바꾸면 이 비밀번호를 쓰는 모든 분께 새 비밀번호를 알려 주세요.</p>
+      <form id="pwForm" style="max-width:380px">
+        <label class="f"><span>새 비밀번호 (8자 이상)</span><input type="password" id="pwNew" minlength="8" autocomplete="new-password" required></label>
+        <label class="f"><span>한 번 더</span><input type="password" id="pwNew2" minlength="8" autocomplete="new-password" required></label>
+        <button class="btn btn-act" type="submit">비밀번호 바꾸기</button>
+        <p class="err" id="pwErr" role="alert"></p>
+      </form>
+    </section>
+  </div>
+</main>
+
+<!-- 교실 편집 창 -->
+<div class="scrim" id="edScrim" hidden>
+  <form class="sheet" id="edForm" role="dialog" aria-modal="true" aria-labelledby="edTitle">
+    <div class="sheet-head"><span class="plate" id="edPlate"></span><h2 id="edTitle" style="font-size:1.3rem">수업 소개 고치기</h2><button type="button" class="x" id="edClose" aria-label="닫기">✕</button></div>
+    <div class="two">
+      <label class="f"><span>교과</span><input type="text" name="subject"></label>
+      <label class="f"><span>수업자</span><input type="text" name="teacher"></label>
+    </div>
+    <label class="f"><span>수업 주제</span><input type="text" name="title"></label>
+    <div class="two">
+      <label class="f"><span>단원</span><input type="text" name="unit"></label>
+      <label class="f"><span>장소</span><input type="text" name="place"><small>'2층'처럼 층을 적으면 위치 보기가 연결됩니다.</small></label>
+    </div>
+    <label class="f"><span>참관 포인트</span><textarea name="point"></textarea></label>
+    <div class="f"><span>수업안</span>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span id="edPlanName" class="muted" style="font-size:.88rem"></span>
+        <label class="btn btn-line">PDF 올리기<input type="file" id="edPlanIn" accept=".pdf,application/pdf"></label>
+        <button type="button" class="btn btn-line" id="edPlanDel">지우기</button></div>
+      <small>또는 링크로 연결: <input type="url" name="planLink" placeholder="https://…" style="margin-top:4px;font:inherit;padding:7px 10px;border:1.5px solid var(--line);border-radius:7px;width:100%"></small></div>
+    <label style="display:flex;gap:8px;align-items:center;margin:4px 0 10px"><input type="checkbox" name="open"> 공개수업 목록에 보이기</label>
+    <button class="btn btn-act wide" type="submit">저장</button>
+  </form>
+</div>
+
+<script>
+(() => {
+const CFG = window.APP_CONFIG, SB = CFG.SUPABASE_URL.replace(/\/$/, ""), REST = SB + "/rest/v1/", KEY = CFG.SUPABASE_KEY;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const H = { apikey: KEY, "Content-Type": "application/json" };
+let PW = sessionStorage.getItem("maean-admin-pw") || "";
+const C = {};   // key -> { data, version }
+
+function toast(m){ document.querySelectorAll(".toast").forEach(x => x.remove()); const t = document.createElement("div"); t.className = "toast"; t.textContent = m; t.setAttribute("role","status"); document.body.append(t); setTimeout(() => t.remove(), 3000); }
+const ERR = { password: "비밀번호가 맞지 않습니다.", locked: "비밀번호를 여러 번 틀려 10분 동안 잠겼습니다. 잠시 뒤 다시 시도해 주세요.", conflict: "다른 분이 먼저 저장한 내용이 있어 새로 불러왔습니다. 확인 후 다시 저장해 주세요.", short: "새 비밀번호는 8자 이상이어야 합니다." };
+async function rpc(fn, args = {}){
+  const r = await fetch(REST + "rpc/" + fn, { method: "POST", headers: H, body: JSON.stringify({ p_pw: PW, ...args }) });
+  if (!r.ok) throw new Error("서버 오류 " + r.status);
+  const d = await r.json();
+  if (d && d.ok === false && (d.error === "password" || d.error === "locked")){ logout(ERR[d.error]); throw new Error(ERR[d.error]); }
+  return d;
+}
+async function fetchContent(){
+  const r = await fetch(REST + "maean_content?select=key,data,version", { headers: { apikey: KEY }, cache: "no-store" });
+  if (!r.ok) throw new Error("내용을 불러오지 못했습니다 " + r.status);
+  (await r.json()).forEach(x => C[x.key] = { data: x.data, version: x.version });
+}
+/* 최신 내용에 변경을 적용해 저장. 그 사이 다른 분이 저장했다면 한 번 더 새로 받아 다시 적용 */
+async function save(key, mutate, { merge = true } = {}){
+  for (let i = 0; i < 2; i++){
+    const next = mutate(structuredClone(C[key].data));
+    const d = await rpc("maean_admin_save", { p_key: key, p_data: next, p_version: C[key].version });
+    if (d.ok){ C[key] = { data: next, version: d.version }; return true; }
+    if (d.error !== "conflict") throw new Error(d.error);
+    await fetchContent();
+    if (!merge){ toast(ERR.conflict); renderAll(); return false; }
+  }
+  toast(ERR.conflict); renderAll(); return false;
+}
+
+/* 파일 올리기: 서버 함수가 비밀번호를 확인하고 1회용 업로드 주소를 줍니다 */
+async function fn(body){
+  const r = await fetch(SB + "/functions/v1/maean-upload", { method: "POST", headers: H, body: JSON.stringify({ password: PW, ...body }) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok || !d.ok) throw new Error(ERR[d.error] || ("올리기 실패: " + (d.error || r.status)));
+  return d;
+}
+async function upload(file, folder, base){
+  if (file.size > 50 * 1024 * 1024) throw new Error(`${file.name}: 50MB보다 큽니다.`);
+  const ext = (file.name.split(".").pop() || "").toLowerCase();
+  const s = await fn({ action: "sign", folder, base, ext });
+  const fd = new FormData(); fd.append("cacheControl", "3600"); fd.append("", file);
+  const r = await fetch(s.signedUrl, { method: "PUT", headers: { apikey: KEY, "x-upsert": "false" }, body: fd });
+  if (!r.ok) throw new Error(`${file.name}: 올리지 못했습니다 (${r.status})`);
+  return s.path;
+}
+const removeFiles = paths => { paths = paths.filter(p => p && !/^https?:/i.test(p)); return paths.length ? fn({ action: "delete", paths }).catch(() => {}) : null; };
+const fileUrl = p => /^https?:/i.test(p) ? p : `${SB}/storage/v1/object/public/${CFG.STORAGE_BUCKET}/${p}`;
+
+/* ---------- 로그인 ---------- */
+function logout(msg){ PW = ""; sessionStorage.removeItem("maean-admin-pw"); $("#app").hidden = true; $("#logout").hidden = true; $("#loginView").hidden = false; $("#loginErr").textContent = msg || ""; }
+$("#logout").onclick = () => logout();
+$("#loginView").addEventListener("submit", async e => { e.preventDefault(); PW = $("#pw").value; await enter(); });
+async function enter(){
+  try {
+    const d = await rpc("maean_admin_login");
+    if (!d.ok) return;
+    sessionStorage.setItem("maean-admin-pw", PW);
+    await fetchContent();
+    $("#loginView").hidden = true; $("#app").hidden = false; $("#logout").hidden = false;
+    renderAll(); showTab(location.hash.slice(1) || "classes");
+  } catch(e){ $("#loginErr").textContent = $("#loginErr").textContent || e.message; }
+}
+if (PW) enter();
+
+/* ---------- 탭 ---------- */
+const TABS = [["classes","수업 소개"],["schedule","당일 일정"],["files","자료실"],["settings","사이트 설정"],["comments","소감 관리"],["checkins","참관자 명단"],["password","비밀번호"]];
+$("#tabs").innerHTML = TABS.map(([k, t]) => `<button role="tab" data-k="${k}">${t}</button>`).join("");
+$("#tabs").onclick = e => { const b = e.target.closest("button"); if (b) showTab(b.dataset.k); };
+function showTab(k){
+  if (!TABS.some(t => t[0] === k)) k = "classes";
+  document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.k === k));
+  document.querySelectorAll(".pane").forEach(p => p.hidden = p.dataset.tab !== k);
+  history.replaceState(null, "", "#" + k);
+  if (k === "comments") loadComments();
+  if (k === "checkins") loadCheckins();
+}
+function renderAll(){ renderClasses(); renderSchedule(); renderFiles(); renderSettings(); }
+
+/* ---------- 수업 소개 ---------- */
+const floorOf = c => ((c.place || "").match(/(\d)\s*층/) || [])[1] || "";
+function renderClasses(){
+  const cs = C.classes.data;
+  $("#classTable").innerHTML = `<thead><tr><th>교실</th><th>교과</th><th>수업 주제</th><th>수업자</th><th>수업안</th><th>공개</th></tr></thead><tbody>` +
+    cs.map((c, i) => `<tr class="click" data-i="${i}"><td><span class="tag" data-floor="${floorOf(c)}">${esc(c.code)}</span></td><td>${esc(c.subject)}</td>
+      <td>${c.title ? esc(c.title) : '<span class="no">비어 있음</span>'}</td><td>${esc(c.teacher)}</td>
+      <td>${c.plan ? '<span class="ok">있음</span>' : '<span class="no">없음</span>'}</td><td>${c.open !== false ? "보임" : '<span class="no">숨김</span>'}</td></tr>`).join("") + "</tbody>";
+}
+$("#classTable").onclick = e => { const tr = e.target.closest("tr[data-i]"); if (tr) openEditor(C.classes.data[+tr.dataset.i].code); };
+
+let edCode = null, edPlan = null;   // edPlan: {plan, planName} 편집 중인 수업안
+function openEditor(code){
+  const c = C.classes.data.find(x => x.code === code); edCode = code; edPlan = { plan: c.plan || "", planName: c.planName || "" };
+  const f = $("#edForm");
+  ["subject","teacher","title","unit","place","point"].forEach(k => f.elements[k].value = c[k] || "");
+  f.elements.open.checked = c.open !== false;
+  f.elements.planLink.value = /^https?:/i.test(c.plan) ? c.plan : "";
+  $("#edPlate").textContent = code; f.dataset.floor = floorOf(c);
+  drawPlan(); $("#edScrim").hidden = false; f.elements.subject.focus();
+}
+function drawPlan(){ $("#edPlanName").textContent = edPlan.plan && !/^https?:/i.test(edPlan.plan) ? (edPlan.planName || "수업안.pdf") : "올린 파일 없음"; $("#edPlanDel").hidden = !edPlan.plan || /^https?:/i.test(edPlan.plan); }
+const closeEditor = () => { $("#edScrim").hidden = true; edCode = null; };
+$("#edClose").onclick = closeEditor;
+$("#edScrim").addEventListener("click", e => { if (e.target.id === "edScrim") closeEditor(); });
+$("#edPlanDel").onclick = () => { edPlan = { plan: "", planName: "" }; drawPlan(); };
+$("#edPlanIn").onchange = async e => {
+  const file = e.target.files[0]; e.target.value = ""; if (!file) return;
+  $("#edPlanName").textContent = "올리는 중…";
+  try { edPlan = { plan: await upload(file, "lessons", edCode), planName: file.name }; drawPlan(); toast("PDF를 올렸습니다. '저장'을 누르면 연결됩니다."); }
+  catch(err){ toast(err.message); drawPlan(); }
+};
+$("#edForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const f = e.target, code = edCode, link = f.elements.planLink.value.trim();
+  const plan = link ? { plan: link, planName: "" } : edPlan;
+  const vals = Object.fromEntries(["subject","teacher","title","unit","place","point"].map(k => [k, f.elements[k].value.trim()]));
+  let old = "";
+  const ok = await save("classes", d => { const c = d.find(x => x.code === code); old = c.plan; Object.assign(c, vals, plan, { open: f.elements.open.checked }); return d; }).catch(err => (toast(err.message), false));
+  if (ok){ if (old && old !== plan.plan) removeFiles([old]); renderClasses(); closeEditor(); toast(`${code} 수업 소개를 저장했습니다.`); }
+});
+
+/* PDF 한꺼번에 */
+$("#pdfBulk").onchange = async e => {
+  const files = [...e.target.files]; e.target.value = ""; if (!files.length) return;
+  const codes = new Set(C.classes.data.map(c => c.code)), log = $("#bulkLog"), done = {};
+  log.innerHTML = "";
+  for (const file of files){
+    const m = file.name.match(/(\d)\s*-\s*(\d{1,2})/), code = m && `${m[1]}-${+m[2]}`;
+    const line = document.createElement("div"); log.append(line);
+    if (!code || !codes.has(code)){ line.innerHTML = `<span style="color:#c8423b">✕ ${esc(file.name)}: 파일 이름에서 교실 번호를 찾지 못했습니다</span>`; continue; }
+    line.textContent = `… ${file.name} → ${code} 올리는 중`;
+    try { done[code] = { plan: await upload(file, "lessons", code), planName: file.name }; line.innerHTML = `<span class="ok">✓ ${esc(file.name)} → ${code}</span>`; }
+    catch(err){ line.innerHTML = `<span style="color:#c8423b">✕ ${esc(err.message)}</span>`; }
+  }
+  if (!Object.keys(done).length) return;
+  let olds = [];
+  const ok = await save("classes", d => { olds = []; d.forEach(c => { if (done[c.code]){ if (c.plan) olds.push(c.plan); Object.assign(c, done[c.code]); } }); return d; }).catch(err => (toast(err.message), false));
+  if (ok){ removeFiles(olds); renderClasses(); toast(`수업안 ${Object.keys(done).length}개를 연결했습니다.`); }
+};
+
+/* 엑셀 */
+const XCOLS = ["교실코드","학년","반","교과","단원","수업 주제","수업자","장소","참관 포인트","수업안 링크","공개"];
+$("#xlsxOut").onclick = () => {
+  const rows = C.classes.data.map(c => [c.code, c.grade, c.cls, c.subject, c.unit, c.title, c.teacher, c.place, c.point, /^https?:/i.test(c.plan) ? c.plan : "", c.open !== false ? "O" : "X"]);
+  const ws = XLSX.utils.aoa_to_sheet([XCOLS, ...rows]);
+  ws["!cols"] = [10,6,5,10,18,32,10,14,44,24,6].map(w => ({ wch: w }));
+  const guide = XLSX.utils.aoa_to_sheet([["작성법"],["교실코드는 바꾸지 마세요."],["참관 포인트는 셀 안 줄바꿈(Alt+Enter)도 그대로 보입니다."],["수업안 PDF는 편집 페이지에서 올립니다. 외부 링크로 연결할 때만 '수업안 링크'에 https:// 주소를 적습니다."],["공개: X 로 적으면 공개수업 목록에서 숨겨집니다."]]);
+  guide["!cols"] = [{ wch: 90 }];
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "수업안내"); XLSX.utils.book_append_sheet(wb, guide, "작성법");
+  XLSX.writeFile(wb, "매안초_수업소개.xlsx");
+};
+$("#xlsxIn").onchange = async e => {
+  const file = e.target.files[0]; e.target.value = ""; if (!file) return;
+  try {
+    const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
+    const ws = wb.Sheets["수업안내"] || wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval: "", raw: false });
+    const get = (r, k) => String(r[k] ?? "").trim();
+    const incoming = rows.map(r => ({ code: get(r, "교실코드"), grade: get(r, "학년"), cls: get(r, "반"), subject: get(r, "교과"), unit: get(r, "단원"), title: get(r, "수업 주제"),
+      teacher: get(r, "수업자"), place: get(r, "장소"), point: get(r, "참관 포인트"), link: get(r, "수업안 링크") || get(r, "수업안 파일"), open: !/^(x|n|no|아니오|비공개)$/i.test(get(r, "공개")) }))
+      .filter(r => /^\d-\d+$/.test(r.code));
+    if (!incoming.length){ toast("'교실코드' 칸이 있는 엑셀인지 확인해 주세요."); return; }
+    const known = new Set(C.classes.data.map(c => c.code)), added = incoming.filter(r => !known.has(r.code)).length;
+    if (!confirmBox(`엑셀의 ${incoming.length}개 학급 내용으로 바꿉니다${added ? ` (새 교실 ${added}개 추가)` : ""}. 올려 둔 수업안 PDF는 그대로 둡니다.`)) return;
+    const ok = await save("classes", d => {
+      incoming.forEach(r => {
+        let c = d.find(x => x.code === r.code);
+        if (!c){ c = { code: r.code, plan: "", planName: "" }; d.push(c); }
+        const { link, ...rest } = r; Object.assign(c, rest);
+        if (/^https?:/i.test(link)) Object.assign(c, { plan: link, planName: "" });
+      });
+      return d.sort((a, b) => a.code.localeCompare(b.code, "ko", { numeric: true }));
+    }).catch(err => (toast(err.message), false));
+    if (ok){ renderClasses(); toast(`엑셀 내용 ${incoming.length}개 학급을 저장했습니다.`); }
+  } catch(err){ toast("엑셀을 읽지 못했습니다: " + err.message); }
+};
+function confirmBox(msg){ try { return window.confirm(msg); } catch(e){ return true; } }
+
+/* ---------- 일정 / 자료실 (줄 편집) ---------- */
+function rowsEditor(box, items, cls, cellsFn, dirtyEl){
+  box.innerHTML = items.map((it, i) => `<div class="grid-in ${cls}" data-i="${i}">${cellsFn(it, i)}
+      <span class="acts"><button type="button" data-a="up" aria-label="위로">↑</button><button type="button" data-a="down" aria-label="아래로">↓</button><button type="button" data-a="del" aria-label="지우기">✕</button></span></div>`).join("")
+    || `<p class="muted">아직 없습니다. 아래 '추가'를 눌러 주세요.</p>`;
+  box.oninput = () => dirtyEl.hidden = false;
+}
+let SCH = [], FIL = [], filRemoved = [];
+function renderSchedule(){ SCH = structuredClone(C.schedule.data); drawSch(); $("#schDirty").hidden = true; }
+function drawSch(){
+  rowsEditor($("#schRows"), SCH, "sch", it => `<input aria-label="시작" placeholder="시작 13:30" value="${esc(it.start)}" data-k="start"><input aria-label="종료" placeholder="종료" value="${esc(it.end)}" data-k="end">
+    <input aria-label="내용" placeholder="내용" value="${esc(it.what)}" data-k="what"><input aria-label="장소" placeholder="장소" value="${esc(it.where)}" data-k="where">`, $("#schDirty"));
+}
+function collect(box, arr){ box.querySelectorAll(".grid-in").forEach(row => row.querySelectorAll("input[data-k]").forEach(inp => arr[+row.dataset.i][inp.dataset.k] = inp.value.trim())); }
+function moveHandler(box, get, redraw, dirty, onDel){
+  box.addEventListener("click", e => {
+    const b = e.target.closest("button[data-a]"); if (!b) return;
+    const arr = get(); collect(box, arr); const i = +b.closest(".grid-in").dataset.i, a = b.dataset.a;
+    if (a === "up" && i > 0) [arr[i-1], arr[i]] = [arr[i], arr[i-1]];
+    if (a === "down" && i < arr.length - 1) [arr[i+1], arr[i]] = [arr[i], arr[i+1]];
+    if (a === "del"){ onDel && onDel(arr[i]); arr.splice(i, 1); }
+    dirty.hidden = false; redraw();
+  });
+}
+moveHandler($("#schRows"), () => SCH, drawSch, $("#schDirty"));
+$("#schAdd").onclick = () => { collect($("#schRows"), SCH); SCH.push({ start: "", end: "", what: "", where: "" }); $("#schDirty").hidden = false; drawSch(); };
+$("#schSave").onclick = async () => {
+  collect($("#schRows"), SCH); const data = SCH.filter(r => r.what || r.start);
+  if (await save("schedule", () => data, { merge: false }).catch(err => (toast(err.message), false))){ renderSchedule(); toast("일정을 저장했습니다."); }
+};
+
+function renderFiles(){ FIL = structuredClone(C.files.data); filRemoved = []; drawFil(); $("#filDirty").hidden = true; }
+function drawFil(){
+  rowsEditor($("#filRows"), FIL, "fil", (it, i) => {
+    const isFile = it.file && !/^https?:/i.test(it.file);
+    return `<input aria-label="구분" placeholder="구분 (예: 보고서)" value="${esc(it.group)}" data-k="group"><input aria-label="제목" placeholder="제목" value="${esc(it.title)}" data-k="title">
+      <span class="filecell">${isFile ? `<span title="${esc(it.name)}">📎 ${esc(it.name || "파일")}</span>` : `<input aria-label="링크" placeholder="https:// 링크 또는 →" value="${esc(it.file)}" data-k="file" style="flex:1">`}
+        <label class="btn btn-line" style="padding:6px 10px;font-size:.8rem">${isFile ? "바꾸기" : "파일"}<input type="file" data-up="${i}"></label></span>
+      <input aria-label="설명" placeholder="설명 (선택)" value="${esc(it.desc)}" data-k="desc">`;
+  }, $("#filDirty"));
+}
+moveHandler($("#filRows"), () => FIL, drawFil, $("#filDirty"), it => { if (it.file) filRemoved.push(it.file); });
+$("#filRows").addEventListener("change", async e => {
+  const inp = e.target.closest("input[data-up]"); if (!inp) return;
+  const file = inp.files[0], i = +inp.dataset.up; if (!file) return;
+  collect($("#filRows"), FIL); toast("올리는 중…");
+  try {
+    const path = await upload(file, "reports", "file");
+    if (FIL[i].file && !/^https?:/i.test(FIL[i].file)) filRemoved.push(FIL[i].file);
+    Object.assign(FIL[i], { file: path, name: file.name }); if (!FIL[i].title) FIL[i].title = file.name.replace(/\.[^.]+$/, "");
+    $("#filDirty").hidden = false; drawFil(); toast("파일을 올렸습니다. '자료실 저장'을 눌러 주세요.");
+  } catch(err){ toast(err.message); }
+});
+$("#filAdd").onclick = () => { collect($("#filRows"), FIL); FIL.push({ group: "", title: "", file: "", name: "", desc: "" }); $("#filDirty").hidden = false; drawFil(); };
+$("#filSave").onclick = async () => {
+  collect($("#filRows"), FIL); const data = FIL.filter(r => r.title && r.file);
+  if (FIL.some(r => r.title && !r.file) && !confirmBox("파일이나 링크가 없는 줄은 저장되지 않습니다. 계속할까요?")) return;
+  if (await save("files", () => data, { merge: false }).catch(err => (toast(err.message), false))){ removeFiles(filRemoved); renderFiles(); toast("자료실을 저장했습니다."); }
+};
+
+/* ---------- 설정 ---------- */
+let SEAL = "", sealOld = "";
+function renderSettings(){
+  const s = C.settings.data, f = $("#setForm");
+  ["RESEARCH_TOPIC","RESEARCH_SUB","EVENT_DATE","EVENT_DATE_LABEL","SCHEDULE_NOTE","REGISTER_URL","CERT_TITLE","CERT_SIGNER","CERT_BODY"].forEach(k => f.elements[k].value = s[k] || "");
+  f.elements.HERO_BADGES.value = (s.HERO_BADGES || []).join("\n");
+  f.querySelectorAll('[name="REGISTER_OPEN"]').forEach(r => r.checked = r.value === String(s.REGISTER_OPEN !== false));
+  f.querySelectorAll('[name="CHECKIN_MODE"]').forEach(r => r.checked = r.value === (s.CHECKIN_MODE || "closed"));
+  SEAL = s.SEAL || ""; sealOld = ""; drawSeal(); $("#setDirty").hidden = true;
+}
+function drawSeal(){ $("#sealPrev").hidden = !SEAL; if (SEAL) $("#sealPrev").src = fileUrl(SEAL); $("#sealDel").hidden = !SEAL; }
+$("#setForm").addEventListener("input", () => $("#setDirty").hidden = false);
+$("#sealIn").onchange = async e => {
+  const file = e.target.files[0]; e.target.value = ""; if (!file) return;
+  try { const p = await upload(file, "assets", "seal"); if (SEAL) sealOld = SEAL; SEAL = p; drawSeal(); $("#setDirty").hidden = false; toast("직인을 올렸습니다. '설정 저장'을 눌러 주세요."); } catch(err){ toast(err.message); }
+};
+$("#sealDel").onclick = () => { sealOld = SEAL; SEAL = ""; drawSeal(); $("#setDirty").hidden = false; };
+$("#setForm").addEventListener("submit", async e => {
+  e.preventDefault(); const f = e.target, v = {};
+  ["RESEARCH_TOPIC","RESEARCH_SUB","EVENT_DATE","EVENT_DATE_LABEL","SCHEDULE_NOTE","REGISTER_URL","CERT_TITLE","CERT_SIGNER","CERT_BODY"].forEach(k => v[k] = f.elements[k].value.trim());
+  v.HERO_BADGES = f.elements.HERO_BADGES.value.split("\n").map(x => x.trim()).filter(Boolean);
+  v.REGISTER_OPEN = (f.querySelector('[name="REGISTER_OPEN"]:checked') || {}).value !== "false";
+  v.CHECKIN_MODE = (f.querySelector('[name="CHECKIN_MODE"]:checked') || {}).value || "closed";
+  v.SEAL = SEAL;
+  if (v.CHECKIN_MODE === "auto" && !v.EVENT_DATE){ toast("'당일 자동'을 쓰려면 보고회 날짜를 정해 주세요."); return; }
+  if (await save("settings", d => ({ ...d, ...v }), { merge: false }).catch(err => (toast(err.message), false))){ if (sealOld) removeFiles([sealOld]); renderSettings(); toast("설정을 저장했습니다."); }
+});
+
+/* ---------- 소감 관리 ---------- */
+let CM = [];
+async function loadComments(){
+  $("#cmTable").innerHTML = `<tr><td class="muted">불러오는 중…</td></tr>`;
+  try { CM = (await rpc("maean_admin_comments")).items || []; drawComments(); } catch(e){ $("#cmTable").innerHTML = `<tr><td>${esc(e.message)}</td></tr>`; }
+}
+function drawComments(){
+  const sel = $("#cmRoom"), cur = sel.value, rooms = [...new Set(CM.map(c => c.room))].sort((a, b) => a.localeCompare(b, "ko", { numeric: true }));
+  sel.innerHTML = `<option value="">전체 교실 (${CM.length})</option>` + rooms.map(r => `<option value="${esc(r)}">${esc(r)} (${CM.filter(c => c.room === r).length})</option>`).join("");
+  sel.value = rooms.includes(cur) ? cur : "";
+  const list = CM.filter(c => !sel.value || c.room === sel.value);
+  $("#cmTable").innerHTML = list.length ? `<thead><tr><th>교실</th><th>소감</th><th>작성자</th><th>시간</th><th></th></tr></thead><tbody>` + list.map(c => `<tr data-id="${c.id}" style="${c.hidden ? "opacity:.5" : ""}">
+      <td>${esc(c.room)}</td><td>${esc(c.text)}${c.hidden ? ' <span class="no">(숨김)</span>' : ""}</td><td>${esc(c.who)}</td><td style="white-space:nowrap">${new Date(c.t).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" })}</td>
+      <td style="white-space:nowrap"><button class="btn btn-line" style="padding:5px 10px;font-size:.8rem" data-a="${c.hidden ? "show" : "hide"}">${c.hidden ? "다시 보이기" : "숨기기"}</button>
+      <button class="btn btn-line" style="padding:5px 10px;font-size:.8rem;color:#c8423b" data-a="del">지우기</button></td></tr>`).join("") + "</tbody>"
+    : `<tr><td class="muted">아직 소감이 없습니다.</td></tr>`;
+}
+$("#cmRoom").onchange = drawComments; $("#cmReload").onclick = loadComments;
+$("#cmTable").onclick = async e => {
+  const b = e.target.closest("button[data-a]"); if (!b) return;
+  const id = +b.closest("tr").dataset.id, a = b.dataset.a;
+  try {
+    if (a === "del"){ if (!confirmBox("이 소감을 지울까요? 되돌릴 수 없습니다.")) return; await rpc("maean_admin_comment_delete", { p_id: id }); }
+    else await rpc("maean_admin_comment_set", { p_id: id, p_hidden: a === "hide" });
+    await loadComments();
+  } catch(err){ toast(err.message); }
+};
+
+/* ---------- 참관자 명단 ---------- */
+let CK = [];
+async function loadCheckins(){
+  try { CK = (await rpc("maean_admin_checkins")).items || []; } catch(e){ toast(e.message); return; }
+  $("#ckCount").textContent = `${CK.length}명`;
+  $("#ckTable").innerHTML = CK.length ? `<thead><tr><th>번호</th><th>소속</th><th>성명</th><th>시간</th></tr></thead><tbody>` + CK.map((c, i) => `<tr><td>${i+1}</td><td>${esc(c.org)}</td><td>${esc(c.name)}</td><td>${new Date(c.t).toLocaleString("ko-KR")}</td></tr>`).join("") + "</tbody>"
+    : `<tr><td class="muted">아직 참관증을 받은 분이 없습니다.</td></tr>`;
+}
+$("#ckReload").onclick = loadCheckins;
+$("#ckCsv").onclick = () => {
+  const q = s => `"${String(s).replace(/"/g, '""')}"`;
+  const csv = "﻿" + [["번호","소속","성명","시간"], ...CK.map((c, i) => [i+1, c.org, c.name, new Date(c.t).toLocaleString("ko-KR")])].map(r => r.map(q).join(",")).join("\r\n");
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = "참관자명단.csv"; a.click();
+};
+
+/* ---------- 비밀번호 ---------- */
+$("#pwForm").addEventListener("submit", async e => {
+  e.preventDefault(); const n = $("#pwNew").value, n2 = $("#pwNew2").value;
+  if (n !== n2){ $("#pwErr").textContent = "두 비밀번호가 다릅니다."; return; }
+  try {
+    const d = await rpc("maean_admin_change_password", { p_new: n });
+    if (!d.ok){ $("#pwErr").textContent = ERR[d.error] || d.error; return; }
+    PW = n; sessionStorage.setItem("maean-admin-pw", PW); e.target.reset(); $("#pwErr").textContent = ""; toast("비밀번호를 바꿨습니다.");
+  } catch(err){ $("#pwErr").textContent = err.message; }
+});
+})();
+</script>
+</body>
+</html>

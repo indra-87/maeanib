@@ -3,52 +3,49 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>주차 및 학교 공간 안내 · 매안초등학교 연구학교 보고회</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
+<title>주차 · 학교 공간 · 매안초등학교 연구학교 보고회</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/config.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="assets/common.js"></script>
 <style>
-  .space-wrap{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#e4e8e3;box-shadow:var(--shadow);height:min(78vh,760px);min-height:520px}
-  .space-wrap iframe{width:100%;height:100%;border:0;display:block}
-  .space-tools{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-  .space-tools p{color:var(--muted);font-size:.9rem}
-  .legend{display:flex;gap:14px;font-size:.82rem;color:var(--muted)}
-  .legend i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--teal-700);margin-right:5px;vertical-align:1px}
-  @media(max-width:600px){.space-wrap{height:72vh;min-height:440px;border-radius:14px}}
+  .viewer{position:relative;border-radius:10px;overflow:hidden;background:#e4e8e3;height:min(78vh,760px);min-height:500px;box-shadow:0 0 0 1px var(--line)}
+  .viewer iframe{width:100%;height:100%;border:0;display:block}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:14px;font-size:.88rem;color:var(--ink-soft)}
+  .legend a{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink)}
+  .legend a i{width:14px;height:14px;border-radius:3px;background:var(--fc)}
+  @media(max-width:600px){.viewer{height:70vh;min-height:420px}}
 </style>
 </head>
 <body>
 
-<section class="hero slim">
-  <div class="wrap">
-    <span class="tag">🅿️ 주차 및 학교 공간 안내</span>
-    <h1>학교 공간 안내</h1>
-    <p class="sub">층을 고르고 드래그해 돌려 보세요. 교실 이름을 누르면 공개수업 소개가 열립니다.</p>
-  </div>
-</section>
+<section class="band"><div class="wrap">
+  <h1>주차 · 학교 공간</h1>
+  <p>층을 고르고 드래그해 돌려 보세요. 교실 이름을 누르면 공개수업 소개가 열립니다.</p>
+</div></section>
 
 <!-- 주차 안내: 내용이 준비되면 이곳에 추가합니다 -->
 
-<section class="block" id="space" style="padding-top:30px">
+<section class="sec" id="space" style="padding-top:28px">
   <div class="wrap">
-    <div class="space-tools">
-      <p>층 선택 · 입체/위에서 보기 · 실 이름 켜고 끄기는 지도 위 버튼으로 합니다.</p>
-      <div class="legend"><span><i></i>공개수업 소개가 있는 교실</span></div>
-    </div>
-    <div class="space-wrap"><iframe id="viewer" title="매안초 3D 학교 공간 안내" loading="eager"></iframe></div>
+    <div class="legend" id="legend" aria-label="층 바로 가기"></div>
+    <div class="viewer"><iframe id="viewer" title="매안초 3D 학교 공간 안내"></iframe></div>
   </div>
 </section>
 
 <script>
 Maean.renderChrome("campus.html");
 const iframe = document.getElementById("viewer");
+const lg = document.getElementById("legend");
+for (let f = 1; f <= 5; f++) lg.insertAdjacentHTML("beforeend", `<a href="#f${f}" data-floor="${f}"><i></i>${f}층</a>`);
+lg.addEventListener("click", e => {
+  const a = e.target.closest("a"); if (!a) return;
+  e.preventDefault(); iframe.contentWindow.location.hash = a.getAttribute("href"); history.replaceState(null, "", a.getAttribute("href"));
+});
 const floorHash = /^#(f\d|all)$/.test(location.hash) ? location.hash : "";
 function boot(byCode){
-  /* 3D 뷰어가 읽어 가는 값: 소개가 있는 교실에 점 표시 */
-  window.MAEAN_ROOM_INFO = {};
-  Object.values(byCode || {}).forEach(c => { if (c.open && c.title) window.MAEAN_ROOM_INFO[c.code] = { title: c.title }; });
+  window.MAEAN_ROOM_INFO = {};   // 3D 뷰어가 읽어 가는 값: 소개가 있는 교실에 점 표시
+  Object.values(byCode || {}).forEach(c => { if (c.open !== false && c.title) window.MAEAN_ROOM_INFO[c.code] = { title: c.title }; });
   iframe.src = "space/3d.html" + floorHash;
 }
 Maean.loadContent().then(d => boot(d.byCode)).catch(() => boot({}));

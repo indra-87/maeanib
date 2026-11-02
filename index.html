@@ -4,48 +4,51 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>매안초등학교 연구학교 보고회</title>
-<meta name="description" content="매안초등학교 연구학교 보고회 참관 안내 · 공개수업 · 당일 일정 · 학교 공간 안내">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
+<meta name="description" content="매안초등학교 연구학교 보고회 참관 안내: 공개수업, 당일 일정, 학교 공간, 참관 확인">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/config.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="assets/common.js"></script>
 </head>
 <body>
 
 <section class="hero">
-  <div class="wrap">
-    <span class="tag">🏫 연구학교 운영 결과 보고회</span>
-    <h1 id="heroTitle"></h1>
-    <p class="sub" id="heroSub"></p>
-    <div class="hero-badges" id="heroBadges" hidden></div>
+  <div class="wrap hero-in">
+    <div>
+      <h1 id="heroTitle">매안초등학교<br>연구학교 보고회</h1>
+      <p class="lead" id="heroSub">오늘 공개하는 수업과 일정, 교실 위치를 이곳에서 확인하세요. 참관을 마치면 서명하고 참관증을 받을 수 있습니다.</p>
+      <div class="when" id="heroBadges" hidden></div>
+    </div>
+    <div>
+      <nav class="building" id="building" aria-label="층별 안내"><div class="roof"></div></nav>
+      <p class="building-cap">층을 누르면 그 층 배치도가 열립니다</p>
+    </div>
   </div>
 </section>
 
-<section class="quicknav" aria-labelledby="qnTitle">
+<nav class="posts" aria-label="참관 안내 바로가기">
+  <div class="wrap"><div class="posts-in">
+    <a class="post" href="classes.html"><span class="ic" aria-hidden="true">📚</span><b>공개수업</b><span id="postClasses">학년별 수업 소개와 수업안</span></a>
+    <a class="post" href="#schedule"><span class="ic" aria-hidden="true">🕐</span><b>당일 일정</b><span>등록부터 결과 발표까지</span></a>
+    <a class="post" href="campus.html"><span class="ic" aria-hidden="true">🅿️</span><b>주차 · 학교 공간</b><span>3D 층별 배치도</span></a>
+    <a class="post" id="postCheckin" href="checkin.html"><span class="ic" aria-hidden="true">✍️</span><b>참관 확인</b><span>서명하고 참관증 받기</span></a>
+  </div></div>
+</nav>
+
+<section class="sec" id="schedule">
   <div class="wrap">
-    <div class="visitor-heading"><h2 id="qnTitle">참관 안내 바로가기</h2><p id="qnDate"></p></div>
-    <nav class="qn-grid" aria-label="참관 안내">
-      <a class="qn-tile feature" href="classes.html"><div class="qn-ic" aria-hidden="true">📚</div><div class="qn-label">공개수업 안내</div><div class="qn-sub" id="qnClassCount">학년별 공개수업 살펴보기</div></a>
-      <a class="qn-tile" href="#schedule"><div class="qn-ic" aria-hidden="true">📅</div><div class="qn-label">당일 일정</div><div class="qn-sub">등록 · 공개수업 · 결과 발표</div></a>
-      <a class="qn-tile" href="campus.html"><div class="qn-ic" aria-hidden="true">🅿️</div><div class="qn-label">주차 및 학교 공간 안내</div><div class="qn-sub">3D 층별 배치도</div></a>
-      <a class="qn-tile" id="qnCheckin" href="checkin.html"><div class="qn-ic" aria-hidden="true">✍️</div><div class="qn-label">참관 확인</div><div class="qn-sub">서명하고 참관증 받기</div></a>
-    </nav>
+    <h2 class="sec-title">당일 일정</h2>
+    <p class="sec-lead" id="schLead">등록은 1층 중앙현관에서 합니다.</p>
+    <ol class="timeline" id="timeline"><li class="muted">불러오는 중…</li></ol>
+    <p class="sch-note" id="schNote"></p>
   </div>
 </section>
 
-<section class="block" id="schedule">
+<section class="sec" id="library" hidden style="background:#fff">
   <div class="wrap">
-    <div class="sec-head"><div class="kicker" id="schKicker">TODAY</div><h2>당일 일정</h2></div>
-    <div id="schBody"><p class="empty-txt" style="text-align:center">불러오는 중…</p></div>
-    <p class="event-note" id="schNote"></p>
-  </div>
-</section>
-
-<section class="block" id="library" hidden style="background:#eaf3f2">
-  <div class="wrap">
-    <div class="sec-head"><div class="kicker">DOWNLOADS</div><h2>연구학교 자료실</h2><p>연구보고서 등 자료를 확인하고 내려받을 수 있습니다.</p></div>
-    <div class="file-list" id="fileList"></div>
+    <h2 class="sec-title">자료실</h2>
+    <p class="sec-lead">연구보고서 등 자료를 열어 보거나 내려받을 수 있습니다.</p>
+    <div class="files" id="fileList"></div>
   </div>
 </section>
 
@@ -53,51 +56,51 @@
 const { CFG, esc } = Maean;
 Maean.renderChrome("index.html");
 
-/* 상단 */
-document.getElementById("heroTitle").innerHTML = CFG.RESEARCH_TOPIC
-  ? esc(CFG.RESEARCH_TOPIC)
-  : `${esc(CFG.SCHOOL_NAME)}<br><span class="hl">연구학교 보고회</span>에 오신 것을 환영합니다`;
-document.getElementById("heroSub").textContent = CFG.RESEARCH_SUB || "공개수업, 당일 일정, 학교 공간 안내와 참관 확인을 이곳에서 한 번에 확인하세요.";
-if ((CFG.HERO_BADGES || []).length){
-  const b = document.getElementById("heroBadges"); b.hidden = false;
-  b.innerHTML = CFG.HERO_BADGES.map(t => `<span>${esc(t)}</span>`).join("");
-}
-document.getElementById("qnDate").textContent = CFG.EVENT_DATE_LABEL ? CFG.EVENT_DATE_LABEL + " · 참관 안내" : "";
-document.getElementById("schKicker").textContent = CFG.EVENT_DATE_LABEL || "TODAY";
-
-/* 참관 확인 타일 */
-const qc = document.getElementById("qnCheckin");
-if (Maean.checkinOpen()){
-  qc.insertAdjacentHTML("afterbegin", `<span class="qn-badge">지금 열림</span>`);
-} else {
-  qc.classList.add("locked"); qc.removeAttribute("href"); qc.setAttribute("aria-disabled", "true");
-  qc.querySelector(".qn-sub").textContent = "보고회 당일에 열립니다";
-}
-
-/* 엑셀 콘텐츠 */
 Maean.loadContent().then(({ classes, schedule, files }) => {
-  const open = classes.filter(c => c.open);
-  if (open.length) document.getElementById("qnClassCount").textContent = `학년별 ${open.length}개 수업 살펴보기`;
+  if (CFG.RESEARCH_TOPIC) document.getElementById("heroTitle").textContent = CFG.RESEARCH_TOPIC;
+  if (CFG.RESEARCH_SUB) document.getElementById("heroSub").textContent = CFG.RESEARCH_SUB;
+  const badges = [CFG.EVENT_DATE_LABEL, ...(CFG.HERO_BADGES || [])].filter(Boolean);
+  if (badges.length){ const b = document.getElementById("heroBadges"); b.hidden = false; b.innerHTML = badges.map(t => `<span>${esc(t)}</span>`).join(""); }
 
-  const sb = document.getElementById("schBody");
-  sb.innerHTML = schedule.length ? `<div class="event-table-wrap"><table class="event-table">
-      <caption class="sr-only">당일 운영 일정</caption>
-      <thead><tr><th scope="col">시간</th><th scope="col">내용</th><th scope="col">장소</th></tr></thead>
-      <tbody>${schedule.map(r => `<tr><th scope="row">${esc(r.time)}</th><td>${esc(r.what)}</td><td>${esc(r.where)}</td></tr>`).join("")}</tbody>
-    </table></div>` : `<p class="empty-txt" style="text-align:center">일정은 추후 안내합니다.</p>`;
+  /* 건물 단면: 5층부터 1층까지 */
+  const open = classes.filter(c => c.open !== false);
+  const bld = document.getElementById("building");
+  for (let f = 5; f >= 1; f--){
+    const here = open.filter(c => c.floor == f);
+    const grades = [...new Set(here.map(c => c.grade))].sort();
+    const label = grades.map(g => {
+      const n = here.filter(c => c.grade === g).length, all = classes.filter(c => c.grade === g).length;
+      return n === all ? `${g}학년` : `${g}학년 일부`;
+    }).join(", ");
+    bld.insertAdjacentHTML("beforeend", `<a class="floor" data-floor="${f}" href="campus.html#f${f}">
+      <span class="no">${f}F</span><span class="what">${label ? `<b>${label}</b><span>${esc(Maean.FLOOR_EXTRA[f] || "")}</span>` : `<b>${esc(Maean.FLOOR_EXTRA[f] || "")}</b>`}</span></a>`);
+  }
+  if (open.length) document.getElementById("postClasses").textContent = `${open.length}개 학급 수업 소개와 수업안`;
+
+  /* 참관 확인 */
+  const pc = document.getElementById("postCheckin");
+  if (Maean.checkinOpen()) pc.insertAdjacentHTML("beforeend", `<span class="live">지금 열림</span>`);
+  else { pc.classList.add("locked"); pc.removeAttribute("href"); pc.setAttribute("aria-disabled", "true"); pc.querySelector("span:not(.ic)").textContent = "보고회 당일에 열립니다"; }
+
+  /* 일정 */
+  const tl = document.getElementById("timeline");
+  tl.innerHTML = schedule.length ? schedule.map(r => `<li>
+      <span class="t">${esc(r.start)}${r.end ? `<small>~ ${esc(r.end)}</small>` : ""}</span><span class="dot" aria-hidden="true"></span>
+      <span class="w"><b>${esc(r.what)}</b><span>${esc(r.where)}</span></span></li>`).join("")
+    : `<li class="muted">일정은 추후 안내합니다.</li>`;
   document.getElementById("schNote").textContent = schedule.length ? (CFG.SCHEDULE_NOTE || "") : "";
 
+  /* 자료실 */
   if (files.length){
     document.getElementById("library").hidden = false;
     document.getElementById("fileList").innerHTML = files.map(f => {
-      const url = Maean.fileUrl(f.file, "files/reports/");
-      const ext = (f.file.split("?")[0].split(".").pop() || "").toUpperCase().slice(0, 4);
-      return `<div class="file"><div class="fic">${esc(ext.length <= 4 && !/\//.test(ext) ? ext : "LINK")}</div>
-        <div class="meta"><h4>${esc(f.title)}</h4><p>${esc([f.group, f.desc].filter(Boolean).join(" · "))}</p></div>
-        <a class="btn btn-primary" href="${esc(url)}" target="_blank" rel="noopener">열기</a></div>`;
+      const isLink = /^https?:/i.test(f.file);
+      const ext = isLink ? "링크" : ((f.name || f.file).split(".").pop() || "").toUpperCase().slice(0, 4);
+      return `<a href="${esc(Maean.fileUrl(f.file))}" target="_blank" rel="noopener"><span class="ext">${esc(ext)}</span>
+        <span><b>${esc(f.title)}</b><small>${esc([f.group, f.desc].filter(Boolean).join(", "))}</small></span><span class="go">열기</span></a>`;
     }).join("");
   }
-}).catch(e => Maean.loadError(document.getElementById("schBody"), e));
+}).catch(e => Maean.loadError(document.getElementById("timeline"), e));
 </script>
 </body>
 </html>

@@ -3,27 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>공개수업 안내 · 매안초등학교 연구학교 보고회</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
+<title>공개수업 · 매안초등학교 연구학교 보고회</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/config.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="assets/common.js"></script>
 </head>
 <body>
 
-<section class="hero slim">
-  <div class="wrap">
-    <span class="tag">📚 공개수업 안내</span>
-    <h1>학년별 공개수업</h1>
-    <p class="sub">교실을 누르면 수업 소개와 수업안을 볼 수 있고, 한 줄 참관 소감을 남길 수 있습니다.</p>
-  </div>
-</section>
+<section class="band"><div class="wrap">
+  <h1>공개수업</h1>
+  <p>교실을 누르면 수업 소개와 수업안을 볼 수 있고, 한 줄 참관 소감을 남길 수 있습니다. 카드 색은 교실이 있는 층을 나타냅니다.</p>
+</div></section>
 
-<section class="block" style="padding-top:34px">
+<section class="sec" style="padding-top:34px">
   <div class="wrap">
-    <div class="filters" id="filters" role="group" aria-label="학년 선택"></div>
-    <div id="groups"><p class="empty-txt" style="text-align:center">불러오는 중…</p></div>
+    <div class="grades" id="grades" role="group" aria-label="학년 고르기"></div>
+    <div id="groups"><p class="muted">불러오는 중…</p></div>
   </div>
 </section>
 
@@ -32,37 +28,39 @@ const { esc } = Maean;
 Maean.renderChrome("classes.html");
 
 Maean.loadContent().then(({ classes }) => {
-  const open = classes.filter(c => c.open);
+  const open = classes.filter(c => c.open !== false);
   const grades = [...new Set(open.map(c => c.grade || "기타"))].sort();
-  const fl = document.getElementById("filters");
+  const gl = document.getElementById("grades");
   let cur = "all";
-  const btns = [["all", "전체"], ...grades.map(g => [g, /^\d$/.test(g) ? g + "학년" : g])];
-  fl.innerHTML = btns.map(([v, t]) => `<button class="chipbtn${v === cur ? " on" : ""}" data-g="${v}" aria-pressed="${v === cur}">${t}</button>`).join("");
-  fl.addEventListener("click", e => {
+  gl.innerHTML = [["all", "전체"], ...grades.map(g => [g, /^\d$/.test(g) ? g + "학년" : g])]
+    .map(([v, t]) => `<button data-g="${v}" aria-pressed="${v === cur}">${t}</button>`).join("");
+  gl.addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
-    cur = b.dataset.g;
-    fl.querySelectorAll("button").forEach(x => { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", x === b); });
-    draw();
+    cur = b.dataset.g; gl.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b)); draw();
   });
   function draw(){
-    const el = document.getElementById("groups");
-    const list = grades.filter(g => cur === "all" || g === cur);
-    el.innerHTML = list.map(g => {
+    document.getElementById("groups").innerHTML = grades.filter(g => cur === "all" || g === cur).map(g => {
       const cs = open.filter(c => (c.grade || "기타") === g).sort((a, b) => (+a.cls || 0) - (+b.cls || 0));
-      return `<div class="grade-group"><h3>${/^\d$/.test(g) ? g + "학년" : esc(g)} <small>${cs.length}개 수업${(f => f.length ? " · " + f.join("·") + "층" : "")([...new Set(cs.map(c => c.floor).filter(Boolean))].sort())}</small></h3>
-        <div class="class-grid">${cs.map(c => `
-          <button class="class-card" data-code="${esc(c.code)}">
-            <div class="top"><span class="code">${esc(c.code)}</span>${c.subject ? `<span class="pill">${esc(c.subject)}</span>` : ""}</div>
-            <div class="title${c.title ? "" : " pending"}">${esc(c.title || "수업 소개 준비 중")}</div>
-            <div class="meta">${esc([c.teacher, c.place].filter(Boolean).join(" · "))}</div>
-          </button>`).join("")}</div></div>`;
-    }).join("") || `<p class="empty-txt" style="text-align:center">등록된 공개수업이 없습니다.</p>`;
+      const floors = [...new Set(cs.map(c => c.floor).filter(Boolean))].sort();
+      return `<section class="grade"><div class="grade-h"><h2>${/^\d$/.test(g) ? g + "학년" : esc(g)}</h2>
+          <span>${cs.length}개 학급${floors.length ? ", " + floors.join("·") + "층" : ""}</span></div>
+        <div class="rooms">${cs.map(c => `
+          <button class="room" data-code="${esc(c.code)}" data-floor="${esc(c.floor)}">
+            <span class="room-plate"><span class="code">${esc(c.code)}</span>${c.floor ? `<span class="fl">${c.floor}층</span>` : ""}</span>
+            <span class="room-body">
+              ${c.subject ? `<span class="subj">${esc(c.subject)}</span>` : ""}
+              <span class="title${c.title ? "" : " none"}">${esc(c.title || "수업 소개 준비 중")}</span>
+              ${c.teacher ? `<span class="by">${esc(c.teacher)}</span>` : ""}
+              ${c.plan ? `<span class="pdf">수업안 있음</span>` : ""}
+            </span>
+          </button>`).join("")}</div></section>`;
+    }).join("") || `<p class="muted">등록된 공개수업이 없습니다.</p>`;
   }
   draw();
   document.getElementById("groups").addEventListener("click", e => {
-    const b = e.target.closest(".class-card"); if (b) Maean.openClassModal(b.dataset.code);
+    const b = e.target.closest(".room"); if (b) Maean.openClassModal(b.dataset.code);
   });
-  /* classes.html#1-3 처럼 열면 그 수업 소개가 바로 뜹니다 (QR 코드용) */
+  /* classes.html#1-3 처럼 열면 그 수업 소개가 바로 뜹니다 (교실 앞 QR 코드용) */
   const h = decodeURIComponent(location.hash.slice(1));
   if (h && open.some(c => c.code === h)) Maean.openClassModal(h);
 }).catch(e => Maean.loadError(document.getElementById("groups"), e));
