@@ -3,6 +3,16 @@
    · 수업 소개 창 (공개수업 안내 · 학교 공간 안내 공통)
    · 한 줄 소감 (본인 것만 수정·삭제)                                   */
 (function(){
+/* ---------- 모든 페이지 공통 머리 부분: 글꼴 · 탭 아이콘 ----------
+   글꼴이나 아이콘을 바꿀 때는 여기만 고치면 됩니다. (각 HTML 파일은 고칠 필요 없음) */
+const FONTS = "https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Nanum+Myeongjo:wght@400;700;800&display=swap";
+[["link", { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" }],
+ ["link", { rel: "stylesheet", href: FONTS }],
+ ["link", { rel: "icon", type: "image/png", href: "assets/favicon.png" }],
+ ["link", { rel: "apple-touch-icon", href: "assets/apple-touch-icon.png" }],
+ ["meta", { name: "theme-color", content: "#1c2347" }],
+].forEach(([tag, attrs]) => { const el = document.createElement(tag); Object.assign(el, attrs); document.head.appendChild(el); });
+
 const BASE = window.APP_CONFIG || {};
 const CFG = { ...BASE };                       // 편집 페이지의 '사이트 설정'이 불러온 뒤 합쳐집니다
 const $ = s => document.querySelector(s);
@@ -80,7 +90,7 @@ function renderChrome(active){
   const h = document.createElement("header"); h.className = "top";
   h.innerHTML = `<div class="wrap top-in">
     <a class="brand" href="index.html" aria-label="${esc(BASE.SCHOOL_NAME)} 연구학교 보고회 첫 화면">
-      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      <img class="brand-logo" src="assets/logo.png" alt="" width="44" height="44">
       <span class="brand-name">${esc(BASE.SCHOOL_NAME || "")}<small>연구학교 보고회</small></span>
     </a>
     <nav class="menu" aria-label="주 메뉴">${NAV.map(([href, t]) => `<a href="${href}"${active === href ? ' aria-current="page"' : ""}>${t}</a>`).join("")}</nav>
@@ -167,7 +177,7 @@ async function openClassModal(code, room){
            <div class="doc-acts"><a class="btn btn-act" href="${esc(fileUrl(c.plan))}" target="_blank" rel="noopener">열기</a><a class="btn btn-line" href="${esc(downloadUrl(c.plan, c.planName))}">내려받기</a></div></div>`
       : `<div class="doc off"><span class="doc-ic" aria-hidden="true">PDF</span><div class="doc-meta"><b>수업안</b><span>준비 중입니다</span></div></div>`;
   }
-  if (c && c.floor && !location.pathname.endsWith("campus.html")) h += `<a class="btn btn-line wide" href="campus.html#f${c.floor}">${c.floor}층 배치도에서 위치 보기</a>`;
+  if (c && c.floor && !location.pathname.endsWith("campus.html")) h += `<a class="btn btn-line wide locate" href="campus.html#f${c.floor}" data-floor="${c.floor}"><svg class="ic-pin" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>${c.floor}층 배치도에서 위치 보기</a>`;
   if (c || isClass){
     h += `<section class="talk" aria-labelledby="cmTalk">
       <h3 id="cmTalk">한 줄 참관 소감 <span id="cmCnt"></span></h3>
