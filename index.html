@@ -114,7 +114,8 @@ Maean.loadContent().then(({ classes, schedule, files }) => {
     document.getElementById("fileList").innerHTML = files.map(f => {
       const isLink = /^https?:/i.test(f.file);
       const ext = isLink ? "링크" : ((f.name || f.file).split(".").pop() || "").toUpperCase().slice(0, 4);
-      return `<a href="${esc(Maean.fileUrl(f.file))}" target="_blank" rel="noopener"><span class="ext">${esc(ext)}</span>
+      const view = Maean.isViewable(f.file);
+      return `<a href="${esc(view ? Maean.viewUrl(f.file, f.name || f.title + ".pdf") : Maean.fileUrl(f.file))}"${view ? "" : ' target="_blank" rel="noopener"'}><span class="ext">${esc(ext)}</span>
         <span><b>${esc(f.title)}</b><small>${esc([f.group, f.desc].filter(Boolean).join(", "))}</small></span><span class="go">열기</span></a>`;
     }).join("");
   }
