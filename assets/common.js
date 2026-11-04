@@ -33,6 +33,10 @@ function fileUrl(p){
   if (/^https?:\/\//i.test(p)) return p;
   return `${SBURL}/storage/v1/object/public/${BASE.STORAGE_BUCKET || "maean"}/${p.split("/").map(encodeURIComponent).join("/")}`;
 }
+/* 올린 PDF는 사이트의 '수업안 보기' 화면(viewer.html)으로 엽니다.
+   카카오톡·삼성인터넷처럼 PDF를 바로 못 열고 내려받기로 넘어가는 브라우저에서도 화면에 보이게 하기 위함 */
+const isViewable = p => !!p && !/^https?:\/\//i.test(p) && /\.pdf$/i.test(p);
+function viewUrl(p, name){ return isViewable(p) ? `viewer.html?f=${encodeURIComponent(p)}&n=${encodeURIComponent(name || "수업안.pdf")}` : fileUrl(p); }
 function downloadUrl(p, name){
   const u = fileUrl(p); if (!u || /^https?:\/\//i.test(p)) return u;
   return u + "?download=" + encodeURIComponent(name || p.split("/").pop());
@@ -192,7 +196,7 @@ async function openClassModal(code, room){
   if (c){
     h += c.plan
       ? `<div class="doc"><span class="doc-ic" aria-hidden="true">PDF</span><div class="doc-meta"><b>수업안</b><span>${esc(c.planName || "수업안")}</span></div>
-           <div class="doc-acts"><a class="btn btn-act" href="${esc(fileUrl(c.plan))}" target="_blank" rel="noopener">열기</a><a class="btn btn-line" href="${esc(downloadUrl(c.plan, c.planName))}">내려받기</a></div></div>`
+           <div class="doc-acts"><a class="btn btn-act" href="${esc(viewUrl(c.plan, c.planName))}"${isViewable(c.plan) ? "" : ' target="_blank" rel="noopener"'}>열기</a><a class="btn btn-line" href="${esc(downloadUrl(c.plan, c.planName))}">내려받기</a></div></div>`
       : `<div class="doc off"><span class="doc-ic" aria-hidden="true">PDF</span><div class="doc-meta"><b>수업안</b><span>준비 중입니다</span></div></div>`;
   }
   if (c && c.floor && !location.pathname.endsWith("campus.html")) h += `<a class="btn btn-line wide locate" href="campus.html#f${c.floor}" data-floor="${c.floor}"><svg class="ic-pin" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>${c.floor}층 배치도에서 위치 보기</a>`;
@@ -262,6 +266,6 @@ function toast(msg){
   document.body.append(t); setTimeout(() => t.remove(), 2600);
 }
 
-window.Maean = { CFG, BASE, esc, rpc, newToken, lsGet, lsSet, REST, KEY, fmtTime, renderChrome, loadContent, loadError, openClassModal, checkinOpen, fileUrl, downloadUrl, logCheckin, toast, kstToday, FLOOR_EXTRA, floorOf };
+window.Maean = { CFG, BASE, esc, viewUrl, isViewable, rpc, newToken, lsGet, lsSet, REST, KEY, fmtTime, renderChrome, loadContent, loadError, openClassModal, checkinOpen, fileUrl, downloadUrl, logCheckin, toast, kstToday, FLOOR_EXTRA, floorOf };
 window.openClassModal = openClassModal;   // 3D 뷰어(iframe)가 이 함수를 부릅니다
 })();
