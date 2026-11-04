@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>수업안 보기 · 매안초등학교 연구학교 보고회</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/config.js"></script>
+<script src="assets/common.js"></script>
+<!-- PDF를 페이지마다 그림으로 그려 보여 주는 도구 (카카오톡·삼성인터넷처럼 PDF를 바로 못 여는 브라우저에서도 보이게) -->
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<style>
+/* 수업안 보기 전용 (style.css가 예전 것이어도 깨지지 않게 이 파일 안에 둠) */
+body.page-viewer{background:#525866;margin:0}
+.pv-bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:10px;padding:8px 12px;background:#1c2347;color:#fff}
+.pv-back{flex:none;width:40px;height:40px;border:0;border-radius:8px;background:rgba(255,255,255,.12);color:#fff;font-size:1.2rem;cursor:pointer}
+.pv-title{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}
+.pv-title b{font-size:.98rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-title span{font-size:.78rem;color:#c9cee6}
+.pv-zoom{display:flex;gap:4px;flex:none}
+.pv-zoom button{width:38px;height:38px;border:0;border-radius:8px;background:rgba(255,255,255,.12);color:#fff;font-size:1.25rem;cursor:pointer}
+.pv-zoom button:disabled{opacity:.35;cursor:default}
+.pv-dl{flex:none;padding:8px 12px!important;font-size:.85rem!important}
+.pv-pages{--zoom:1;padding:12px 8px 40px;display:flex;flex-direction:column;align-items:center;gap:10px;overflow-x:auto}
+.pv-pages.zoomed{align-items:flex-start}
+.pv-page{position:relative;background:#fff;width:calc(min(100%, 900px) * var(--zoom));flex:none;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.pv-page canvas{display:block;width:100%;height:100%}
+.pv-no{position:absolute;right:6px;bottom:6px;font-size:.7rem;color:#fff;background:rgba(0,0,0,.45);padding:1px 7px;border-radius:999px}
+.pv-msg{color:#fff;text-align:center;margin-top:30vh;line-height:1.8}
+@media(max-width:420px){.pv-dl{display:none}}
+</style>
+</head>
+<body class="page-viewer">
+<header class="pv-bar">
+  <button class="pv-back" id="pvBack" type="button" aria-label="뒤로">←</button>
+  <div class="pv-title"><b id="pvName">수업안</b><span id="pvInfo">불러오는 중…</span></div>
+  <div class="pv-zoom" role="group" aria-label="크기">
+    <button type="button" id="zoomOut" aria-label="작게">−</button><button type="button" id="zoomIn" aria-label="크게">+</button>
+  </div>
+  <a class="btn btn-line pv-dl" id="pvDl" href="#">내려받기</a>
+</header>
+<main class="pv-pages" id="pages"><p class="pv-msg" id="pvMsg">수업안을 불러오는 중입니다…</p></main>
+
+<script>
+(async () => {
+const qs = new URLSearchParams(location.search), path = qs.get("f") || "", name = qs.get("n") || "수업안.pdf";
+const $ = id => document.getElementById(id);
+const url = Maean.fileUrl(path);
+$("pvName").textContent = name.replace(/\.pdf$/i, "");
+document.title = name + " · 매안초등학교 연구학교 보고회";
+$("pvDl").href = Maean.downloadUrl(path, name);
+$("pvBack").onclick = () => { if (history.length > 1) history.back(); else location.href = "classes.html"; };
+if (!path){ $("pvMsg").textContent = "열 파일이 지정되지 않았습니다."; return; }
+
+const CDN = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/";
+pdfjsLib.GlobalWorkerOptions.workerSrc = CDN + "build/pdf.worker.min.js";
+let pdf;
+try {
+  pdf = await pdfjsLib.getDocument({ url, cMapUrl: CDN + "cmaps/", cMapPacked: true, standardFontDataUrl: CDN + "standard_fonts/" }).promise;
+} catch(e){
+  $("pvInfo").textContent = "";
+  $("pvMsg").innerHTML = `수업안을 화면에 띄우지 못했습니다.<br><a class="btn btn-act" style="margin-top:14px" href="${Maean.esc(Maean.downloadUrl(path, name))}">내려받아 보기</a>`;
+  return;
+}
+$("pvInfo").textContent = `${pdf.numPages}쪽`;
+$("pvMsg").remove();
+
+/* 쪽마다 자리를 먼저 만들고, 화면에 가까워지면 그림으로 그림 (긴 수업안도 휴대폰이 버벅이지 않게) */
+let zoom = 1;
+const box = $("pages"), slots = [];
+const first = await pdf.getPage(1), base = first.getViewport({ scale: 1 });
+for (let i = 1; i <= pdf.numPages; i++){
+  const s = document.createElement("div"); s.className = "pv-page"; s.dataset.n = i;
+  s.style.aspectRatio = `${base.width} / ${base.height}`;
+  s.innerHTML = `<span class="pv-no">${i} / ${pdf.numPages}</span>`;
+  box.append(s); slots.push(s);
+}
+const drawn = new Map();
+async function render(slot){
+  const n = +slot.dataset.n, key = n + "@" + zoom;
+  if (drawn.get(n) === key) return; drawn.set(n, key);
+  const page = await pdf.getPage(n), vp1 = page.getViewport({ scale: 1 });
+  const cssW = slot.clientWidth, dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  const vp = page.getViewport({ scale: cssW / vp1.width * dpr });
+  const cv = document.createElement("canvas"); cv.width = Math.floor(vp.width); cv.height = Math.floor(vp.height);
+  slot.style.aspectRatio = `${vp1.width} / ${vp1.height}`;
+  await page.render({ canvasContext: cv.getContext("2d"), viewport: vp }).promise;
+  if (drawn.get(n) !== key) return;               // 그리는 사이 크기가 바뀌었으면 버림
+  slot.querySelector("canvas")?.remove(); slot.prepend(cv);
+}
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) render(e.target); }), { rootMargin: "800px 0px" });
+slots.forEach(s => io.observe(s));
+
+function setZoom(z){
+  zoom = Math.max(1, Math.min(3, z));
+  box.style.setProperty("--zoom", zoom); box.classList.toggle("zoomed", zoom > 1);
+  $("zoomOut").disabled = zoom <= 1; $("zoomIn").disabled = zoom >= 3;
+  slots.forEach(s => { const r = s.getBoundingClientRect(); if (r.bottom > -800 && r.top < innerHeight + 800) render(s); });
+}
+$("zoomIn").onclick = () => setZoom(zoom + .5);
+$("zoomOut").onclick = () => setZoom(zoom - .5);
+setZoom(1);
+let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { drawn.clear(); setZoom(zoom); }, 300); });
+})();
+</script>
+</body>
+</html>
