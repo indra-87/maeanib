@@ -129,7 +129,12 @@ function smallSignature(src){
 }
 
 /* ── 참관증 ── */
-function today(){ const d = new Date(); return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`; }
+/* 참관 일자: 편집 페이지 설정에 따라 '등록한 날짜'(오늘) 또는 '지정한 날짜' */
+function today(){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(CFG.CERT_DATE_MODE === "fixed" ? (CFG.CERT_DATE || "") : "");
+  if (m) return `${+m[1]}년 ${+m[2]}월 ${+m[3]}일`;
+  const d = new Date(); return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
+}
 function fitCert(){
   const stage = $("certStage"), avail = Math.min(stage.parentElement.clientWidth, 794);
   const s = avail / $("cert").offsetWidth;
