@@ -84,6 +84,13 @@
           <label class="f"><span>발급자</span><input type="text" name="CERT_SIGNER"></label>
         </div>
         <label class="f"><span>참관증 본문</span><textarea name="CERT_BODY" placeholder="위 사람은 …"></textarea></label>
+        <div class="f"><span>참관 일자 (참관증 맨 아래 날짜)</span>
+          <div class="radios" style="align-items:center">
+            <label><input type="radio" name="CERT_DATE_MODE" value="issued"><span>등록한 날짜</span></label>
+            <label><input type="radio" name="CERT_DATE_MODE" value="fixed"><span>지정한 날짜</span></label>
+            <input type="date" name="CERT_DATE" aria-label="지정한 참관 일자" style="font:inherit;padding:8px 10px;border:1.5px solid var(--line);border-radius:7px;width:auto">
+          </div>
+          <small>'등록한 날짜'는 참관증을 받은 날이 찍힙니다. 보고회 뒤에 늦게 등록하는 분이 있다면 '지정한 날짜'로 보고회 날짜를 정해 두세요.</small></div>
         <div class="f"><span>학교장 직인 이미지</span>
           <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
             <img class="seal-prev" id="sealPrev" alt="직인 미리보기" hidden>
@@ -418,10 +425,14 @@ function renderSettings(){
   ["RESEARCH_TOPIC","RESEARCH_SUB","EVENT_DATE","EVENT_DATE_LABEL","SCHEDULE_NOTE","RESEARCH_TASKS","CERT_TITLE","CERT_SIGNER","CERT_BODY"].forEach(k => f.elements[k].value = s[k] || "");
   f.elements.HERO_BADGES.value = (s.HERO_BADGES || []).join("\n");
   f.querySelectorAll('[name="CHECKIN_MODE"]').forEach(r => r.checked = r.value === (s.CHECKIN_MODE || "closed"));
+  f.querySelectorAll('[name="CERT_DATE_MODE"]').forEach(r => r.checked = r.value === (s.CERT_DATE_MODE || "issued"));
+  f.elements.CERT_DATE.value = s.CERT_DATE || s.EVENT_DATE || "";
+  f.elements.CERT_DATE.disabled = (s.CERT_DATE_MODE || "issued") !== "fixed";
   SEAL = s.SEAL || ""; sealOld = ""; drawSeal(); $("#setDirty").hidden = true;
 }
 function drawSeal(){ $("#sealPrev").hidden = !SEAL; if (SEAL) $("#sealPrev").src = fileUrl(SEAL); $("#sealDel").hidden = !SEAL; }
 $("#setForm").addEventListener("input", () => $("#setDirty").hidden = false);
+$("#setForm").addEventListener("change", e => { if (e.target.name === "CERT_DATE_MODE") $("#setForm").elements.CERT_DATE.disabled = e.target.value !== "fixed"; });
 $("#sealIn").onchange = async e => {
   const file = e.target.files[0]; e.target.value = ""; if (!file) return;
   try { const p = await upload(file, "assets", "seal"); if (SEAL) sealOld = SEAL; SEAL = p; drawSeal(); $("#setDirty").hidden = false; toast("직인을 올렸습니다. '설정 저장'을 눌러 주세요."); } catch(err){ toast(err.message); }
@@ -433,6 +444,9 @@ $("#setForm").addEventListener("submit", async e => {
   v.HERO_BADGES = f.elements.HERO_BADGES.value.split("\n").map(x => x.trim()).filter(Boolean);
   v.CHECKIN_MODE = (f.querySelector('[name="CHECKIN_MODE"]:checked') || {}).value || "closed";
   v.SEAL = SEAL;
+  v.CERT_DATE_MODE = (f.querySelector('[name="CERT_DATE_MODE"]:checked') || {}).value || "issued";
+  v.CERT_DATE = f.elements.CERT_DATE.value;
+  if (v.CERT_DATE_MODE === "fixed" && !v.CERT_DATE){ toast("'지정한 날짜'를 쓰려면 날짜를 골라 주세요."); return; }
   if (v.CHECKIN_MODE === "auto" && !v.EVENT_DATE){ toast("'당일 자동'을 쓰려면 보고회 날짜를 정해 주세요."); return; }
   if (await save("settings", d => ({ ...d, ...v }), { merge: false }).catch(err => (toast(err.message), false))){ if (sealOld) removeFiles([sealOld]); renderSettings(); toast("설정을 저장했습니다."); }
 });
