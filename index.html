@@ -43,6 +43,14 @@
   </div>
 </section>
 
+<section class="sec" id="library" hidden style="background:#fff">
+  <div class="wrap">
+    <h2 class="sec-title">자료실</h2>
+    <p class="sec-lead">연구보고서 등 자료를 열어 보거나 내려받을 수 있습니다.</p>
+    <div class="files" id="fileList"></div>
+  </div>
+</section>
+
 <section class="sec" id="schedule">
   <div class="wrap">
     <h2 class="sec-title">당일 일정</h2>
@@ -52,13 +60,6 @@
   </div>
 </section>
 
-<section class="sec" id="library" hidden style="background:#fff">
-  <div class="wrap">
-    <h2 class="sec-title">자료실</h2>
-    <p class="sec-lead">연구보고서 등 자료를 열어 보거나 내려받을 수 있습니다.</p>
-    <div class="files" id="fileList"></div>
-  </div>
-</section>
 
 <script>
 const { CFG, esc } = Maean;
@@ -85,10 +86,12 @@ Maean.loadContent().then(({ classes, schedule, files }) => {
   const bld = document.getElementById("building");
   for (let f = 5; f >= 1; f--){
     const here = open.filter(c => c.floor == f);
-    const grades = [...new Set(here.map(c => c.grade))].sort();
-    const label = grades.map(g => {
-      const n = here.filter(c => c.grade === g).length, all = classes.filter(c => c.grade === g).length;
-      return n === all ? `${g}학년` : `${g}학년 일부`;
+    /* 그 층의 공개수업 교실 번호: 같은 학년에서 이어지는 반은 1-1~1-7처럼 묶어 표시 */
+    const label = [...new Set(here.map(c => c.grade))].sort().map(g => {
+      const ns = here.filter(c => c.grade === g).map(c => +c.cls).sort((x, y) => x - y), out = [];
+      for (let i = 0; i < ns.length; i++){ let j = i; while (j + 1 < ns.length && ns[j + 1] === ns[j] + 1) j++;
+        out.push(j - i >= 2 ? `${g}-${ns[i]}~${g}-${ns[j]}` : ns.slice(i, j + 1).map(n => `${g}-${n}`).join(", ")); i = j; }
+      return out.join(", ");
     }).join(", ");
     bld.insertAdjacentHTML("beforeend", `<a class="floor" data-floor="${f}" href="campus.html#f${f}">
       <span class="no">${f}F</span><span class="what">${label ? `<b>${label}</b><span>${esc(Maean.FLOOR_EXTRA[f] || "")}</span>` : `<b>${esc(Maean.FLOOR_EXTRA[f] || "")}</b>`}</span></a>`);
