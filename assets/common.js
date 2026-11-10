@@ -79,12 +79,15 @@ function checkinOpen(){
 }
 
 /* ---------- 머리말 / 꼬리말 ---------- */
+/* IB 디지털 도구모음 (외부 페이지 · 새 창으로 열림). 주소가 바뀌면 여기만 고치면 됩니다 */
+const TOOLS_URL = "https://claude.ai/artifact/QMQPdT4BvzftonhDezbMFQ";
 const NAV = [
   ["classes.html", "공개수업"],
   ["index.html#schedule", "당일 일정"],
   ["campus.html", "학교 공간"],
   ["questions.html", "사전 질문"],
   ["checkin.html", "참관 확인"],
+  [TOOLS_URL, "IB 도구모음"],
 ];
 /* 휴대폰인데 브라우저가 'PC 버전'으로 보여 주고 있으면 (화면이 작게 축소되어 보임) 안내 띠를 띄웁니다 */
 function pcModeHint(){
@@ -106,7 +109,9 @@ function renderChrome(active){
       <img class="brand-logo" src="assets/logo.png" alt="" width="44" height="44">
       <span class="brand-name">${esc(BASE.SCHOOL_NAME || "")}<small>연구학교 보고회</small></span>
     </a>
-    <nav class="menu" aria-label="주 메뉴">${NAV.map(([href, t]) => `<a href="${href}"${active === href ? ' aria-current="page"' : ""}>${t}</a>`).join("")}</nav>
+    <nav class="menu" aria-label="주 메뉴">${NAV.map(([href, t]) => /^https?:/.test(href)
+      ? `<a href="${href}" target="_blank" rel="noopener" class="ext">${t}<span class="sr-only"> (새 창)</span></a>`
+      : `<a href="${href}"${active === href ? ' aria-current="page"' : ""}>${t}</a>`).join("")}</nav>
   </div>`;
   document.body.prepend(h);
   const f = document.createElement("footer"); f.className = "foot";
@@ -266,6 +271,6 @@ function toast(msg){
   document.body.append(t); setTimeout(() => t.remove(), 2600);
 }
 
-window.Maean = { CFG, BASE, esc, viewUrl, isViewable, rpc, newToken, lsGet, lsSet, REST, KEY, fmtTime, renderChrome, loadContent, loadError, openClassModal, checkinOpen, fileUrl, downloadUrl, logCheckin, toast, kstToday, FLOOR_EXTRA, floorOf };
+window.Maean = { CFG, BASE, esc, TOOLS_URL, viewUrl, isViewable, rpc, newToken, lsGet, lsSet, REST, KEY, fmtTime, renderChrome, loadContent, loadError, openClassModal, checkinOpen, fileUrl, downloadUrl, logCheckin, toast, kstToday, FLOOR_EXTRA, floorOf };
 window.openClassModal = openClassModal;   // 3D 뷰어(iframe)가 이 함수를 부릅니다
 })();
