@@ -405,3 +405,11 @@ body.page-admin{background:#eef0f6}
 .facts div{display:flex;flex-wrap:wrap;column-gap:12px;grid-template-columns:none}
 .facts dt{flex:0 0 6.5em}
 .facts dd{flex:1 1 12em;min-width:0}
+
+/* ===== 첫 화면: 강당 UOI 부스 안내 팝업 ===== */
+.booth-pop .sheet{max-width:500px;gap:14px}
+.booth-pop .sheet h2{font-size:1.55rem;line-height:1.35}
+.booth-pop .sheet p{color:var(--ink-soft);line-height:1.75}
+.booth-pop .booth-when{display:flex;flex-wrap:wrap;gap:6px 16px;color:var(--ink)!important;font-weight:600;background:var(--paper);border-radius:8px;padding:10px 14px}
+.booth-pop .booth-acts{display:flex;gap:8px;flex-wrap:wrap}
+.booth-pop .booth-acts .btn{flex:1 1 140px;white-space:normal}
