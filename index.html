@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>매안초등학교 연구학교 보고회</title>
 <meta name="description" content="매안초등학교 연구학교 보고회 참관 안내: 공개수업, 당일 일정, 학교 공간, 참관 확인">
-<link rel="stylesheet" href="assets/style.css">
-<script src="assets/config.js"></script>
-<script src="assets/common.js"></script>
+<link rel="stylesheet" href="assets/style.css?v=20261110a">
+<script src="assets/config.js?v=20261110a"></script>
+<script src="assets/common.js?v=20261110a"></script>
 </head>
 <body class="page-index">
 
@@ -32,7 +32,6 @@
     <a class="post" href="campus.html"><span class="ic" aria-hidden="true">🗺️</span><b>학교 공간</b><span>3D 층별 배치도, 2층 강당</span></a>
     <a class="post" href="questions.html"><span class="ic" aria-hidden="true">🙋</span><b>사전 질문</b><span>궁금한 점 미리 남기기</span></a>
     <a class="post" id="postCheckin" href="checkin.html"><span class="ic" aria-hidden="true">✍️</span><b>참관 확인</b><span>서명하고 참관증 받기</span></a>
-    <a class="post" id="postTools" href="#" target="_blank" rel="noopener"><span class="ic" aria-hidden="true">🧰</span><b>IB 디지털 도구모음</b><span>수업에 쓰는 디지털 도구 (새 창)</span></a>
   </div></div>
 </nav>
 
@@ -64,7 +63,6 @@
 
 <script>
 const { CFG, esc } = Maean;
-document.getElementById("postTools").href = Maean.TOOLS_URL;
 Maean.renderChrome("index.html");
 
 Maean.loadContent().then(({ classes, schedule, files }) => {

@@ -414,19 +414,7 @@ body.page-admin{background:#eef0f6}
 .booth-pop .booth-acts{display:flex;gap:8px;flex-wrap:wrap}
 .booth-pop .booth-acts .btn{flex:1 1 140px;white-space:normal}
 
-/* 바로가기 6개 (PC 3×2) · 외부 링크 표시 */
-.posts-in{grid-template-columns:repeat(3,1fr)}
-.post{border-top:1px solid var(--line)}
-.post:nth-child(-n+3){border-top:0}
-.post:nth-child(3n+1){border-left:0}
-.post:nth-child(3n+2),.post:nth-child(3n+3){border-left:1px solid var(--line)}
+/* 상단 메뉴의 외부 링크 표시 */
 .menu a.ext::after{content:"↗";font-size:.8em;margin-left:2px;opacity:.6}
-@media(max-width:860px){
-  .posts-in{grid-template-columns:1fr 1fr}
-  .post:nth-child(n){border-left:1px solid var(--line);border-top:1px solid var(--line);grid-column:auto}
-  .post:nth-child(odd){border-left:0}
-  .post:nth-child(-n+2){border-top:0}
-}
-@media(max-width:520px){.posts-in{grid-template-columns:1fr}.post:nth-child(n){border-left:0;border-top:1px solid var(--line)}.post:first-child{border-top:0}}
 /* 휴대폰: 메뉴 6개를 옆으로 밀지 않고 두 줄로 모두 보이게 */
 @media(max-width:600px){.menu{flex-wrap:wrap;overflow-x:visible;row-gap:0;margin:0 -6px}.menu a{padding:6px 7px}}
