@@ -79,7 +79,7 @@ function checkinOpen(){
 }
 
 /* ---------- 머리말 / 꼬리말 ---------- */
-/* 상단 메뉴 '스마트 IB' = IB 디지털 도구모음 (외부 페이지 · 새 창으로 열림). 주소가 바뀌면 여기만 고치면 됩니다 */
+/* 상단 메뉴 'IB 도구모음' = IB 디지털 도구모음 (외부 페이지 · 새 창으로 열림). 주소를 바꿀 때는 index.html의 바로가기 주소도 함께 바꿔 주세요 */
 const TOOLS_URL = "https://claude.ai/artifact/QMQPdT4BvzftonhDezbMFQ";
 const NAV = [
   ["classes.html", "공개수업"],
@@ -87,7 +87,7 @@ const NAV = [
   ["campus.html", "학교 공간"],
   ["questions.html", "사전 질문"],
   ["checkin.html", "참관 확인"],
-  [TOOLS_URL, "스마트 IB"],
+  [TOOLS_URL, "IB 도구모음"],
 ];
 /* 휴대폰인데 브라우저가 'PC 버전'으로 보여 주고 있으면 (화면이 작게 축소되어 보임) 안내 띠를 띄웁니다 */
 function pcModeHint(){
