@@ -32,6 +32,7 @@
     <a class="post" href="campus.html"><span class="ic" aria-hidden="true">🗺️</span><b>학교 공간</b><span>3D 층별 배치도, 2층 강당</span></a>
     <a class="post" href="questions.html"><span class="ic" aria-hidden="true">🙋</span><b>사전 질문</b><span>궁금한 점 미리 남기기</span></a>
     <a class="post" id="postCheckin" href="checkin.html"><span class="ic" aria-hidden="true">✍️</span><b>참관 확인</b><span>서명하고 참관증 받기</span></a>
+    <a class="post" id="postTools" href="#" target="_blank" rel="noopener"><span class="ic" aria-hidden="true">🧰</span><b>IB 디지털 도구모음</b><span>수업에 쓰는 디지털 도구 (새 창)</span></a>
   </div></div>
 </nav>
 
@@ -63,6 +64,7 @@
 
 <script>
 const { CFG, esc } = Maean;
+document.getElementById("postTools").href = Maean.TOOLS_URL;
 Maean.renderChrome("index.html");
 
 Maean.loadContent().then(({ classes, schedule, files }) => {
@@ -126,11 +128,12 @@ Maean.loadContent().then(({ classes, schedule, files }) => {
 }).catch(e => Maean.loadError(document.getElementById("timeline"), e));
 
 /* ---------- 강당 UOI 부스 안내 팝업 ----------
-   · 첫 화면에서만  · 한 번 닫으면 그 기기에서는 다시 안 뜸
+   · 첫 화면에서만  · 하루에 한 번 (닫으면 그날은 다시 안 뜨고, 다음 날 처음 들어올 때 다시 뜸)
    · 보고회 날(EVENT_DATE) 14:00(한국 시간)이 지나면 자동으로 안 뜸          */
 function boothPopup(){
   const SEEN = "maean-booth-popup-seen", END_TIME = "14:00";
-  try { if (localStorage.getItem(SEEN)) return; } catch(e){}
+  const today = Maean.kstToday();                       // 한국 시간 기준 날짜
+  try { if (localStorage.getItem(SEEN) === today) return; } catch(e){}
   if (CFG.EVENT_DATE){
     const end = new Date(`${CFG.EVENT_DATE}T${END_TIME}:00+09:00`);
     if (!isNaN(end) && Date.now() >= end.getTime()) return;
@@ -144,7 +147,7 @@ function boothPopup(){
       <p class="booth-when"><span>🕐 13:20~14:00</span><span>📍 2층 강당</span></p>
       <div class="booth-acts"><a class="btn btn-act" href="campus.html#f2" data-close>강당 위치 보기</a><button class="btn btn-line" type="button" data-close>닫기</button></div>
     </div>`;
-  const close = () => { try { localStorage.setItem(SEEN, "1"); } catch(e){} wrap.remove(); document.body.style.overflow = ""; removeEventListener("keydown", onKey); };
+  const close = () => { try { localStorage.setItem(SEEN, today); } catch(e){} wrap.remove(); document.body.style.overflow = ""; removeEventListener("keydown", onKey); };
   const onKey = e => { if (e.key === "Escape") close(); };
   wrap.addEventListener("click", e => { if (e.target === wrap || e.target.closest("[data-close]")) close(); });
   addEventListener("keydown", onKey);
