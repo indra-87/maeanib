@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<!-- 매안초 IB 디지털 도구 모음 (claude.ai 아티팩트를 사이트 안으로 옮김) -->
+<html lang="ko"><head><meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>매안초등학교 IB 디지털 도구 모음</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<style>
+  :root{
+    --cream:#FFF8EC;
+    --paper:#FFFDF7;
+    --ink:#4A3426;
+    --ink-soft:#8A6E5C;
+    --line:#F0DFC8;
+    --shadow:0 6px 0 rgba(150,100,60,.10), 0 10px 24px rgba(150,100,60,.10);
+    --g1:#F28C7A; --g1s:#FDE5DF;
+    --g2:#F5A54A; --g2s:#FDEBD3;
+    --g3:#E8B931; --g3s:#FBF1CC;
+    --g4:#7DB86A; --g4s:#E5F2DD;
+    --g5:#5DA9D6; --g5s:#DDEEF8;
+    --g6:#A98BD4; --g6s:#EEE6F8;
+    --g7:#B8896A; --g7s:#F2E6DC;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;word-break:keep-all;overflow-wrap:break-word;line-break:strict;background:var(--cream);color:var(--ink);
+    font-family:"Gowun Dodum",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(rgba(200,150,100,.08) 1.2px, transparent 1.4px);
+    background-size:18px 18px;
+  }
+  h1,h2,h3,.jua{font-family:"Jua","Gowun Dodum",sans-serif;font-weight:400}
+
+  /* ---------- Hero scene ---------- */
+  .hero{position:relative;overflow:hidden;height:470px;
+    background:linear-gradient(180deg,#FFD9A8 0%,#FFE9C9 45%,#FFF3DE 100%)}
+  .hero svg.scene{position:absolute;inset:auto 0 0 0;width:100%;height:100%}
+  .hero-text{position:absolute;left:0;right:0;top:26px;text-align:center;z-index:3;padding:0 16px}
+  .hero-text .badge{display:inline-block;background:#E8744A;color:#fff;font-family:"Jua",sans-serif;font-size:clamp(17px,4.6vw,21px);letter-spacing:1px;line-height:1;border-radius:999px;padding:9px 20px 8px;box-shadow:0 4px 0 #C25A34,0 8px 16px rgba(194,90,52,.25)}
+  .school{display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0 2px}
+  .school-name{font-family:"Jua",sans-serif;font-size:clamp(42px,11vw,64px);line-height:1.05;letter-spacing:2px;
+    color:#D2603A;
+    text-shadow:0 3px 0 #FFF6E8,0 6px 0 rgba(210,96,58,.18),0 10px 20px rgba(200,110,60,.15);
+    animation:hello 3.6s ease-in-out infinite;display:inline-block}
+  .spark{font-size:clamp(18px,4.5vw,26px);color:#F5B841;animation:twk 2.4s ease-in-out infinite;display:inline-block}
+  .spark.s-r{animation-delay:-1.2s;color:#F28C7A}
+  @keyframes hello{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+  @keyframes twk{0%,100%{transform:scale(.8) rotate(0);opacity:.6}50%{transform:scale(1.2) rotate(20deg);opacity:1}}
+  .hero-text h1{margin:4px 0 4px;font-size:clamp(24px,6vw,34px);color:#6B3F22;
+    text-shadow:0 3px 0 #fff, 0 5px 0 rgba(200,120,60,.18)}
+  .hero-text p{margin:0;color:#8A5A3A;font-size:15px;text-wrap:balance}
+  .hero-text h1{text-wrap:balance}
+  @media(max-width:420px){
+    .card{padding:14px 12px;gap:12px}
+    .card .ic{width:46px;height:46px;border-radius:14px}
+    .card .ic svg{width:25px;height:25px}
+    .card h3{font-size:17px}
+    .card p{font-size:14px;line-height:1.55}
+    .card .go{width:26px;height:26px}
+  }
+
+  .sun{transform-origin:center;transform-box:fill-box;animation:spin 40s linear infinite}
+  .sun-glow{animation:pulse 4s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+  .cloud{animation:drift linear infinite}
+  .c1{animation-duration:48s}.c2{animation-duration:64s;animation-delay:-20s}.c3{animation-duration:56s;animation-delay:-38s}
+  .flag{transform-origin:left center;transform-box:fill-box;animation:wave 1.6s ease-in-out infinite}
+  .tree{transform-origin:bottom center;transform-box:fill-box;animation:sway 5s ease-in-out infinite}
+  .tree.t2{animation-delay:-1.5s}.tree.t3{animation-delay:-3s}
+  .bird{animation:fly 18s linear infinite}
+  .bird path{animation:flap .6s ease-in-out infinite alternate;transform-origin:center;transform-box:fill-box}
+  .float{animation:bob 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+  .float.f2{animation-delay:-1.3s}.float.f3{animation-delay:-2.6s}
+  .window{animation:twinkle 6s ease-in-out infinite}
+  .window.w2{animation-delay:-2s}.window.w3{animation-delay:-4s}
+
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.12);opacity:.3}}
+  @keyframes drift{from{transform:translateX(-260px)}to{transform:translateX(1500px)}}
+  @keyframes wave{0%,100%{transform:skewY(0) scaleX(1)}50%{transform:skewY(-8deg) scaleX(.92)}}
+  @keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+  @keyframes fly{from{transform:translate(-80px,0)}50%{transform:translate(700px,-20px)}to{transform:translate(1500px,10px)}}
+  @keyframes flap{from{transform:scaleY(1)}to{transform:scaleY(.4)}}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-10px) rotate(6deg)}}
+  @keyframes twinkle{0%,100%{fill:#FFE7A3}50%{fill:#FFF6D6}}
+
+  /* ---------- Toolbar ---------- */
+  .bar{position:sticky;top:0;z-index:20;background:rgba(255,248,236,.92);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border-bottom:2px dashed var(--line);padding:12px 0 10px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+  .search{position:relative;margin-bottom:10px}
+  .search input{width:100%;font:inherit;font-size:16px;color:var(--ink);
+    padding:12px 14px 12px 44px;border-radius:16px;border:2px solid var(--line);background:#fff;
+    outline:none;transition:border-color .2s, box-shadow .2s}
+  .search input:focus{border-color:#F3B87A;box-shadow:0 0 0 4px rgba(243,184,122,.25)}
+  .search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:#C98B5E}
+  .chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;font-family:"Jua";font-size:15px;border:2px solid var(--line);background:#fff;color:var(--ink-soft);
+    border-radius:999px;padding:7px 14px;cursor:pointer;transition:transform .15s, background .2s, color .2s;
+    box-shadow:0 3px 0 var(--line)}
+  .chip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+  .chip.on{background:var(--c,#F5A54A);border-color:var(--c,#F5A54A);color:#fff;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+
+  /* ---------- Sections ---------- */
+  main{padding:18px 0 40px}
+  .list-head{display:flex;align-items:center;gap:8px;margin:8px 0 14px}
+  .list-head .jua{font-size:22px}
+  .list-head .count{font-size:13px;color:var(--ink-soft)}
+  .list-head .rule{flex:1;border-top:2px dashed var(--line);margin-left:6px}
+  .grade{margin:22px 0 30px;animation:rise .6s both}
+  .grade-head{display:flex;align-items:center;gap:12px;margin:0 0 14px}
+  .grade-icon{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;
+    background:var(--c);color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.12);transform:rotate(-4deg)}
+  .grade-icon svg{width:28px;height:28px}
+  .grade-head h2{margin:0;font-size:26px}
+  .grade-head .count{font-size:13px;color:var(--ink-soft);margin-left:2px}
+  .grade-head .rule{flex:1;height:0;border-top:2px dashed var(--line);margin-left:6px}
+
+  .grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+  .grid>*{min-width:0}
+  @media(min-width:620px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(min-width:960px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+  .card{position:relative;display:flex;gap:14px;align-items:flex-start;text-decoration:none;color:inherit;
+    background:var(--paper);border:2px solid var(--line);border-radius:20px;padding:14px 14px 14px 14px;
+    box-shadow:var(--shadow);transition:transform .2s cubic-bezier(.3,1.6,.5,1), box-shadow .2s, border-color .2s;
+    animation:pop .5s both}
+  a.card:hover{transform:translateY(-4px) rotate(-.4deg);border-color:var(--c)}
+  a.card:active{transform:translateY(1px) scale(.99)}
+  .card .ic{flex:none;width:52px;height:52px;border-radius:16px;display:grid;place-items:center;
+    background:var(--s);color:var(--c);transition:transform .3s}
+  a.card:hover .ic{transform:rotate(-8deg) scale(1.06)}
+  .card .ic svg{width:28px;height:28px}
+  .card .body{min-width:0;flex:1}
+  .card h3{margin:2px 0 4px;font-size:18px;line-height:1.3;text-wrap:balance}
+  .card .unit{display:inline-block;margin:0 0 4px;font-family:"Jua";font-size:12px;color:var(--c);background:var(--s);border-radius:8px;padding:2px 8px}
+  .card p{margin:0;font-size:14px;line-height:1.5;color:var(--ink-soft);text-wrap:pretty}
+  .card .meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:#B0927E}
+  .card .meta span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .card .meta{flex-wrap:nowrap!important}
+  .card .grade-tag{flex:none;font-family:"Jua";font-size:12.5px;line-height:1;color:#fff;background:var(--gc);border-radius:999px;padding:4px 9px 3px;box-shadow:0 2px 0 rgba(0,0,0,.08)}
+  .card .tag{background:var(--s);color:var(--c);border-radius:8px;padding:2px 8px;font-family:"Jua";font-size:12px}
+  .card .go{flex:none;align-self:center;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+    background:var(--s);color:var(--c);transition:transform .2s}
+  a.card:hover .go{transform:translateX(3px)}
+  .card .go svg{width:16px;height:16px}
+  .card.off{border-style:dashed;background:rgba(255,253,247,.6);box-shadow:none}
+  .card.off .ic{filter:saturate(.6)}
+  .note{font-size:12px;color:#B0927E}
+
+  .empty{text-align:center;padding:36px 10px;color:var(--ink-soft)}
+  .empty svg{width:64px;height:64px;color:#E6B98E;animation:bob 3s ease-in-out infinite}
+
+  footer{text-align:center;color:#B0927E;font-size:13px;padding:10px 16px 40px}
+  footer .pencil{display:inline-block;animation:bob 3s ease-in-out infinite}
+
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  @keyframes pop{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+  }
+
+  /* 매안초 보고회 안내로 돌아가기 */
+  .back-strip{position:relative;z-index:30;background:#1c2347;color:#fff;font-family:"Gowun Dodum",system-ui,sans-serif}
+  .back-strip a{display:flex;align-items:center;gap:8px;max-width:1080px;margin:0 auto;padding:9px 16px;color:#fff;text-decoration:none;font-size:14px}
+  .back-strip img{width:26px;height:26px}
+  .back-strip b{font-family:"Jua",sans-serif;font-weight:400}
+</style>
+</head>
+<body>
+<nav class="back-strip" aria-label="보고회 안내로 돌아가기"><a href="index.html">← <img src="assets/logo.png" alt=""><span><b>매안초등학교 연구학교 보고회</b> 안내로 돌아가기</span></a></nav>
+
+<!-- Icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="i-palette" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.5-.2-.8-.5-1.2-.3-.4-.5-.8-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-4-4-7.4-9-7.4z"></path><circle cx="7.5" cy="11" r="1.1" fill="currentColor"></circle><circle cx="10.5" cy="7.3" r="1.1" fill="currentColor"></circle><circle cx="15" cy="7.8" r="1.1" fill="currentColor"></circle></g>
+    <g id="i-board" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"></rect><path d="M8 21l2-4M16 21l-2-4"></path><rect x="6" y="7" width="5" height="4" rx=".6"></rect><rect x="13" y="7" width="5" height="6" rx=".6"></rect></g>
+    <g id="i-chat" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H10l-5 4v-4H4z"></path><circle cx="9" cy="10.5" r=".8" fill="currentColor"></circle><circle cx="12" cy="10.5" r=".8" fill="currentColor"></circle><circle cx="15" cy="10.5" r=".8" fill="currentColor"></circle></g>
+    <g id="i-game" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="19" height="11" rx="5"></rect><path d="M7 10.5v4M5 12.5h4"></path><circle cx="15.5" cy="11.3" r="1" fill="currentColor"></circle><circle cx="18" cy="13.7" r="1" fill="currentColor"></circle></g>
+    <g id="i-compass" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M15.5 8.5l-2 5-5 2 2-5z"></path></g>
+    <g id="i-heart" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"></path><path d="M9.5 11.5c.6.8 1.5 1.2 2.5 1.2s1.9-.4 2.5-1.2"></path></g>
+    <g id="i-music" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V6l10-2v12"></path><circle cx="6.5" cy="18" r="2.5"></circle><circle cx="16.5" cy="16" r="2.5"></circle></g>
+    <g id="i-book" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5z"></path><path d="M12 6.5v13"></path></g>
+    <g id="i-globe" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="8"></circle><path d="M4 11h16M12 3c2.6 3 2.6 13 0 16M12 3c-2.6 3-2.6 13 0 16"></path><path d="M8 21h8"></path></g>
+    <g id="i-bowl" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18a9 9 0 0 1-18 0z"></path><path d="M8.5 7.5c0-1.2 1-1.2 1-2.5M12 7.5c0-1.2 1-1.2 1-2.5M15.5 7.5c0-1.2 1-1.2 1-2.5"></path></g>
+    <g id="i-scroll" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12a2 2 0 0 1 0 4h-1v10a2 2 0 0 1-2 2H5a2 2 0 0 1 0-4h1z"></path><path d="M6 16h9a2 2 0 0 1 0 4M9.5 9h4.5M9.5 12h3"></path></g>
+    <g id="i-check" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"></rect><path d="M9 4V2.8h6V4"></path><path d="M8.5 10.5l1.5 1.5 3-3M8.5 16l1.5 1.5 3-3"></path><path d="M15 11h1M15 16.5h1"></path></g>
+    <g id="i-note" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="3" width="14" height="18" rx="2"></rect><path d="M5.5 7.5H3.5M5.5 12H3.5M5.5 16.5H3.5M9.5 8h6M9.5 12h6M9.5 16h3.5"></path></g>
+    <g id="i-blocks" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="13" width="8" height="8" rx="1.2"></rect><rect x="13" y="13" width="8" height="8" rx="1.2"></rect><path d="M12 3l4.5 7.5h-9z"></path></g>
+    <g id="i-calendar" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2.5"></rect><path d="M3 10h18M8 3v4M16 3v4"></path><path d="M7 14h2M11 14h2M15 14h2M7 17.5h2M11 17.5h2"></path></g>
+    <g id="i-chalk" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3.5" width="18" height="12.5" rx="1.5"></rect><path d="M8 21l2-5M16 21l-2-5"></path><path d="M7 12l3-3 2.5 2L17 7"></path></g>
+    <g id="i-bulb" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 18h5M10.5 21h3"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></g>
+    <g id="i-pencil" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4.5L16.5 4a2 2 0 0 1 2.9 0l.6.6a2 2 0 0 1 0 2.9L8.5 19z"></path><path d="M14.5 6l3.5 3.5M4 20l4.5-1"></path></g>
+    <g id="i-magnify" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L21 21"></path><path d="M8 9a3 3 0 0 1 2.5-1.5"></path></g>
+    <g id="i-tree" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-5"></path><path d="M12 3.5c-3 0-5.5 2.4-5.5 5.4 0 .7.1 1.3.4 1.9A3.5 3.5 0 0 0 8 17.5h8a3.5 3.5 0 0 0 1.1-6.7c.3-.6.4-1.2.4-1.9 0-3-2.5-5.4-5.5-5.4z"></path></g>
+    <g id="i-medal" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3l2.5 5M16 3l-2.5 5"></path><circle cx="12" cy="14" r="6"></circle><path d="M12 11l.9 1.9 2 .3-1.5 1.4.4 2-1.8-1-1.8 1 .4-2-1.5-1.4 2-.3z"></path></g>
+    <g id="i-sprout" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-9"></path><path d="M12 12c0-4-3-6.5-7.5-6.5 0 4 3 6.5 7.5 6.5zM12 10c0-3.3 2.6-5.7 7.5-5.7 0 3.6-2.7 5.7-7.5 5.7z"></path><path d="M7 21h10"></path></g>
+    <g id="i-cloud" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 .5-8 6 6 0 0 0-11.5 1.5A3.3 3.3 0 0 0 7 18z"></path><path d="M9 14h2M13 14h3M10.5 11.5h3"></path></g>
+    <g id="i-phone" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"></rect><path d="M11 18.5h2"></path><path d="M9.5 8.5l2 2-2 2M13 12.5h2"></path></g>
+    <g id="i-people" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"></circle><circle cx="17" cy="9.5" r="2.3"></circle><path d="M3.5 19c.5-3 2.8-5 5.5-5s5 2 5.5 5M14.5 14.6c.8-.4 1.6-.6 2.5-.6 2.2 0 3.8 1.6 4.2 4"></path></g>
+    <g id="i-apple" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7.5c-1.3-1.4-4-1.8-5.8.2-2.2 2.4-1.4 7.6 1.8 10.8 1.3 1.3 2.6 1.3 4 .5 1.4.8 2.7.8 4-.5 3.2-3.2 4-8.4 1.8-10.8-1.8-2-4.5-1.6-5.8-.2z"></path><path d="M12 7.5c0-2 1-3.5 3-4.5"></path></g>
+    <g id="i-backpack" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"></path><path d="M9.5 4.5V3.5a2.5 2.5 0 0 1 5 0v1"></path><rect x="9" y="13" width="6" height="4" rx="1"></rect></g>
+    <g id="i-camera" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2.5h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"></path><circle cx="12" cy="13" r="3.5"></circle></g>
+    <g id="i-arrow" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"></path></g>
+    <g id="i-search" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L20 20"></path></g>
+  </defs>
+</svg>
+
+<header class="hero">
+  <div class="hero-text">
+    <span class="badge">🎓 IB 학교</span>
+    <div class="school"><span class="spark s-l">✦</span><span class="school-name">매안초등학교</span><span class="spark s-r">✦</span></div>
+    <h1>IB 디지털 도구 모음</h1>
+  </div>
+
+  <svg class="scene" viewBox="0 0 1200 470" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><g transform="translate(0 140)">
+    <!-- sun -->
+    <g transform="translate(1040 78)">
+      <circle class="sun-glow" r="70" fill="#FFE29A"></circle>
+      <g class="sun">
+        <g stroke="#FFC25C" stroke-width="6" stroke-linecap="round">
+          <line x1="0" y1="-58" x2="0" y2="-46"></line><line x1="0" y1="58" x2="0" y2="46"></line>
+          <line x1="-58" y1="0" x2="-46" y2="0"></line><line x1="58" y1="0" x2="46" y2="0"></line>
+          <line x1="-41" y1="-41" x2="-33" y2="-33"></line><line x1="41" y1="41" x2="33" y2="33"></line>
+          <line x1="-41" y1="41" x2="-33" y2="33"></line><line x1="41" y1="-41" x2="33" y2="-33"></line>
+        </g>
+      </g>
+      <circle r="36" fill="#FFC25C"></circle>
+      <circle cx="-11" cy="-4" r="3" fill="#8A5A3A"></circle><circle cx="11" cy="-4" r="3" fill="#8A5A3A"></circle>
+      <path d="M-10 8 Q0 16 10 8" stroke="#8A5A3A" stroke-width="3" fill="none" stroke-linecap="round"></path>
+      <circle cx="-20" cy="6" r="5" fill="#FF9F7A" opacity=".6"></circle><circle cx="20" cy="6" r="5" fill="#FF9F7A" opacity=".6"></circle>
+    </g>
+
+    <!-- clouds -->
+    <g class="cloud c1"><g transform="translate(0 110)" fill="#fff" opacity=".95">
+      <ellipse cx="60" cy="20" rx="60" ry="20"></ellipse><circle cx="40" cy="8" r="22"></circle><circle cx="76" cy="2" r="28"></circle></g></g>
+    <g class="cloud c2"><g transform="translate(0 60)" fill="#fff" opacity=".85">
+      <ellipse cx="50" cy="16" rx="50" ry="16"></ellipse><circle cx="34" cy="6" r="18"></circle><circle cx="64" cy="0" r="22"></circle></g></g>
+    <g class="cloud c3"><g transform="translate(0 150)" fill="#fff" opacity=".8">
+      <ellipse cx="40" cy="12" rx="40" ry="12"></ellipse><circle cx="26" cy="4" r="14"></circle><circle cx="52" cy="0" r="17"></circle></g></g>
+
+    <!-- birds -->
+    <g class="bird"><g transform="translate(0 130)" fill="none" stroke="#8A5A3A" stroke-width="2.5" stroke-linecap="round">
+      <path d="M0 0 q7 -7 14 0 q7 -7 14 0"></path></g></g>
+
+    <!-- floating doodles -->
+    <g transform="translate(150 175)"><g class="float" color="#F28C7A"><svg width="34" height="34" viewBox="0 0 24 24"><use href="#i-pencil"></use></svg></g></g>
+    <g transform="translate(940 190)"><g class="float f2" color="#7DB86A"><svg width="34" height="34" viewBox="0 0 24 24"><use href="#i-book"></use></svg></g></g>
+    <g transform="translate(280 120)"><g class="float f3" color="#5DA9D6"><svg width="28" height="28" viewBox="0 0 24 24"><use href="#i-bulb"></use></svg></g></g>
+    <g transform="translate(830 130)"><g class="float f2" color="#E8B931"><svg width="28" height="28" viewBox="0 0 24 24"><use href="#i-medal"></use></svg></g></g>
+
+    <!-- hills -->
+    <path d="M0 270 Q200 220 420 255 T840 250 T1200 240 V330 H0z" fill="#CDE6B4"></path>
+    <path d="M0 290 Q260 255 560 285 T1200 275 V330 H0z" fill="#B3D99B"></path>
+
+    <!-- trees -->
+    <g transform="translate(330 230)"><g class="tree"><rect x="-4" y="10" width="8" height="30" rx="3" fill="#A9774F"></rect><circle cx="0" cy="0" r="24" fill="#8CC474"></circle><circle cx="-12" cy="10" r="16" fill="#9ACF82"></circle><circle cx="12" cy="8" r="16" fill="#7DB86A"></circle></g></g>
+    <g transform="translate(880 228)"><g class="tree t2"><rect x="-4" y="10" width="8" height="32" rx="3" fill="#A9774F"></rect><circle cx="0" cy="0" r="26" fill="#F2B880"></circle><circle cx="-13" cy="10" r="16" fill="#F5A54A"></circle><circle cx="13" cy="9" r="16" fill="#F7C08A"></circle></g></g>
+    <g transform="translate(250 250)"><g class="tree t3"><rect x="-3" y="8" width="6" height="22" rx="3" fill="#A9774F"></rect><circle cx="0" cy="0" r="17" fill="#9ACF82"></circle></g></g>
+    <g transform="translate(960 252)"><g class="tree t2"><rect x="-3" y="8" width="6" height="22" rx="3" fill="#A9774F"></rect><circle cx="0" cy="0" r="17" fill="#8CC474"></circle></g></g>
+
+    <!-- school -->
+    <g transform="translate(600 0)">
+      <!-- flag -->
+      <line x1="0" y1="110" x2="0" y2="168" stroke="#8A5A3A" stroke-width="3"></line>
+      <path class="flag" d="M1 112 h30 l-6 9 l6 9 h-30z" fill="#F28C7A"></path>
+      <!-- main building -->
+      <rect x="-150" y="200" width="300" height="95" rx="6" fill="#FFF4E2" stroke="#E7C9A6" stroke-width="3"></rect>
+      <path d="M-160 204 L0 170 L160 204z" fill="#E88A62"></path>
+      <!-- center tower -->
+      <rect x="-42" y="165" width="84" height="130" rx="6" fill="#FFF8EC" stroke="#E7C9A6" stroke-width="3"></rect>
+      <path d="M-52 170 L0 132 L52 170z" fill="#D9714A"></path>
+      <circle cx="0" cy="190" r="14" fill="#fff" stroke="#E7C9A6" stroke-width="3"></circle>
+      <path d="M0 190 v-8 M0 190 h6" stroke="#8A5A3A" stroke-width="2.4" stroke-linecap="round"></path>
+      <!-- door -->
+      <path d="M-16 295 v-36 a16 16 0 0 1 32 0 v36z" fill="#B8714A"></path>
+      <circle cx="9" cy="278" r="2" fill="#FFE29A"></circle>
+      <!-- windows -->
+      <g>
+        <rect class="window" x="-130" y="218" width="30" height="26" rx="4" fill="#FFE7A3" stroke="#E7C9A6" stroke-width="2"></rect>
+        <rect class="window w2" x="-88" y="218" width="30" height="26" rx="4" fill="#FFE7A3" stroke="#E7C9A6" stroke-width="2"></rect>
+        <rect class="window w3" x="58" y="218" width="30" height="26" rx="4" fill="#FFE7A3" stroke="#E7C9A6" stroke-width="2"></rect>
+        <rect class="window" x="100" y="218" width="30" height="26" rx="4" fill="#FFE7A3" stroke="#E7C9A6" stroke-width="2"></rect>
+        <rect class="window w3" x="-130" y="256" width="30" height="26" rx="4" fill="#FFE7A3" stroke="#E7C9A6" stroke-width="2"></rect>
+        <rect class="window" x="-88" y="256" width="30" height="26" rx="4" fill="#FFE7A3" stroke="#E7C9A6" stroke-width="2"></rect>
+        <rect class="window w2" x="58" y="256" width="30" height="26" rx="4" fill="#FFE7A3" stroke="#E7C9A6" stroke-width="2"></rect>
+        <rect class="window w3" x="100" y="256" width="30" height="26" rx="4" fill="#FFE7A3" stroke="#E7C9A6" stroke-width="2"></rect>
+      </g>
+      <!-- path -->
+      <path d="M-16 295 L-40 330 H40 L16 295z" fill="#F3DDBF"></path>
+    </g>
+  </g></svg>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <label class="search" style="margin-bottom:0">
+      <svg viewBox="0 0 24 24"><use href="#i-search"></use></svg>
+      <input id="q" type="search" placeholder="도구 이름이나 수업 내용 검색" autocomplete="off">
+    </label>
+  </div>
+</div>
+
+<main>
+  <div class="wrap" id="list"><div class="list-head"><span class="jua">전체 도구</span><span class="count">41개</span><span class="rule"></span></div>
+    <div class="grid"><a class="card" href="https://script.google.com/macros/s/AKfycbyAlm3U1H61gmzyvUKrQMH8ieB-FloB9epJpooh4oX7hadfnScaGYk_mOryaEoCNho/exec" target="_blank" rel="noopener" style="--c:var(--g1);--s:var(--g1s);animation-delay:0ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-game"></use></svg></div>
+    <div class="body"><h3>Apps Script</h3><p>게임 제작</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g1);--gs:var(--g1s)">1학년</span><span>script.google.com</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://padlet.com/seonwoong2533/2026-5-11-5-24-w5gnuc5raxhizl1m" target="_blank" rel="noopener" style="--c:var(--g2);--s:var(--g2s);animation-delay:40ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-board"></use></svg></div>
+    <div class="body"><h3>패들렛</h3><p>학생 활동 내용 공유</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g2);--gs:var(--g2s)">2학년</span><span>padlet.com</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://indra-87.github.io/ibti/" target="_blank" rel="noopener" style="--c:var(--g3);--s:var(--g3s);animation-delay:80ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-compass"></use></svg></div>
+    <div class="body"><h3>자기 이해 진단 IBTI&nbsp;(학생)</h3><p>나는 어떤 학습자상일까? 진단해보는 앱</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g3);--gs:var(--g3s)">3학년</span><span>indra-87.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://indra-87.github.io/adibti/" target="_blank" rel="noopener" style="--c:var(--g4);--s:var(--g4s);animation-delay:120ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-people"></use></svg></div>
+    <div class="body"><h3>자기 이해 진단 IBTI&nbsp;(성인)</h3><p>나는 어떤 학습자상일까? 진단해보는 앱</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g3);--gs:var(--g3s)">3학년</span><span>indra-87.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://indra-87.github.io/emocheck/" target="_blank" rel="noopener" style="--c:var(--g5);--s:var(--g5s);animation-delay:160ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-heart"></use></svg></div>
+    <div class="body"><h3>감정 출석부</h3><span class="unit">탐구단원1</span><p>나의 감정을 다양하게 표현하는 방법</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g3);--gs:var(--g3s)">3학년</span><span>indra-87.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://indra-87.github.io/songmaker" target="_blank" rel="noopener" style="--c:var(--g6);--s:var(--g6s);animation-delay:200ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-music"></use></svg></div>
+    <div class="body"><h3>소리보물 노래 만들기</h3><span class="unit">탐구단원1</span><p>소리보물 노래 가사로 노래 만들기</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g3);--gs:var(--g3s)">3학년</span><span>indra-87.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://padlet.com/indra87/2-cmdm3chjy7fsgsqb" target="_blank" rel="noopener" style="--c:var(--g1);--s:var(--g1s);animation-delay:240ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-board"></use></svg></div>
+    <div class="body"><h3>패들렛 샌드박스</h3><span class="unit">탐구단원2 관계맺기</span><p>질문 만들기 수업</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g3);--gs:var(--g3s)">3학년</span><span>padlet.com</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://indra-87.github.io/story/" target="_blank" rel="noopener" style="--c:var(--g2);--s:var(--g2s);animation-delay:280ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-chat"></use></svg></div>
+    <div class="body"><h3>옛이야기 속 인물 챗봇</h3><span class="unit">탐구단원2 저출산 고령화 수업</span><p>옛 이야기의 배경을 바꾸어 써보기</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g3);--gs:var(--g3s)">3학년</span><span>indra-87.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://indra-87.github.io/simapp/" target="_blank" rel="noopener" style="--c:var(--g3);--s:var(--g3s);animation-delay:320ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-phone"></use></svg></div>
+    <div class="body"><h3>이야기 속 앱 제작 공방</h3><span class="unit">탐구단원2 지능정보화 수업</span><p>이야기 속 인물의 문제점을 해결해주는 앱 제작하기</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g3);--gs:var(--g3s)">3학년</span><span>indra-87.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://indra-87.github.io/voyage/" target="_blank" rel="noopener" style="--c:var(--g4);--s:var(--g4s);animation-delay:360ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-globe"></use></svg></div>
+    <div class="body"><h3>세계여행 무역수첩</h3><span class="unit">탐구단원2 세계화 수업</span><p>심청이의 세계여행 상상일기 쓰기</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g3);--gs:var(--g3s)">3학년</span><span>indra-87.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://padlet.com/indra87/4-al7baxbflmllg3xg" target="_blank" rel="noopener" style="--c:var(--g5);--s:var(--g5s);animation-delay:400ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-board"></use></svg></div>
+    <div class="body"><h3>패들렛</h3><p>심청이의 세계여행 상상일기 게시용 패들렛</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g3);--gs:var(--g3s)">3학년</span><span>padlet.com</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://indra-87.github.io/food-search/" target="_blank" rel="noopener" style="--c:var(--g6);--s:var(--g6s);animation-delay:440ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-bowl"></use></svg></div>
+    <div class="body"><h3>세계 음식 조사</h3><span class="unit">탐구단원2 세계화 수업</span><p>세계 음식을 조사하고 소개카드 만들기</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g3);--gs:var(--g3s)">3학년</span><span>indra-87.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://indra-87.github.io/vibe" target="_blank" rel="noopener" style="--c:var(--g1);--s:var(--g1s);animation-delay:480ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-game"></use></svg></div>
+    <div class="body"><h3>학습 게임 제작 앱</h3><span class="unit">탐구단원2</span><p>작품 발표회를 위한 게임 앱을 제작하는 앱</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g3);--gs:var(--g3s)">3학년</span><span>indra-87.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://padlet.com/indra87/3-s024gajcl1wudgo6vxjk" target="_blank" rel="noopener" style="--c:var(--g2);--s:var(--g2s);animation-delay:520ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-board"></use></svg></div>
+    <div class="body"><h3>패들렛</h3><span class="unit">탐구단원2</span><p>작품 발표회를 위해 학생들이 제작한 게임 앱 모음</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g3);--gs:var(--g3s)">3학년</span><span>padlet.com</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://indra-87.github.io/customs/" target="_blank" rel="noopener" style="--c:var(--g3);--s:var(--g3s);animation-delay:560ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-scroll"></use></svg></div>
+    <div class="body"><h3>옛날과 오늘날의 풍습 조사 앱</h3><span class="unit">탐구단원3</span><p>옛날과 오늘날의 풍습을 조사하고 비교하기</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g3);--gs:var(--g3s)">3학년</span><span>indra-87.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://indra-87.github.io/ib-uoi-eval/" target="_blank" rel="noopener" style="--c:var(--g4);--s:var(--g4s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-check"></use></svg></div>
+    <div class="body"><h3>IB UOI 학생 평가 시스템</h3><p>IB UOI 서술형 평가 채점 도움 프로그램</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g3);--gs:var(--g3s)">3학년</span><span>indra-87.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://knightayj52.github.io/lesson-blog/" target="_blank" rel="noopener" style="--c:var(--g5);--s:var(--g5s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-note"></use></svg></div>
+    <div class="body"><h3>수업 블로그 기록</h3><p>수업 복기</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g4);--gs:var(--g4s)">4학년</span><span>knightayj52.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://knightayj52.github.io/Lesson-Design/" target="_blank" rel="noopener" style="--c:var(--g6);--s:var(--g6s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-blocks"></use></svg></div>
+    <div class="body"><h3>개념기반 단원설계 도우미</h3><p>개념기반 탐구수업 단원 설계를 위한 웹 앱</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g4);--gs:var(--g4s)">4학년</span><span>knightayj52.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://knightayj52.github.io/PYP-Planner/" target="_blank" rel="noopener" style="--c:var(--g1);--s:var(--g1s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-calendar"></use></svg></div>
+    <div class="body"><h3>PYP 탐구 단원 설계</h3><p>초학문적 주제와 성취기준을 연결해 중심아이디어부터 탐구 과정까지 정리</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g4);--gs:var(--g4s)">4학년</span><span>knightayj52.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://knightayj52.github.io/Lesson-Runner/" target="_blank" rel="noopener" style="--c:var(--g2);--s:var(--g2s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-chalk"></use></svg></div>
+    <div class="body"><h3>수업 실행 도우미</h3><p>단원 설계안을 차시별 수업과 일정 연결, 수업자료 제작</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g4);--gs:var(--g4s)">4학년</span><span>knightayj52.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://knightayj52.github.io/concept-step/" target="_blank" rel="noopener" style="--c:var(--g3);--s:var(--g3s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-bulb"></use></svg></div>
+    <div class="body"><h3>개념 한 걸음</h3><p>학생의 오개념 예상 및 질문과 교정 발문 준비</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g4);--gs:var(--g4s)">4학년</span><span>knightayj52.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://knightayj52.github.io/lesson-sketch/" target="_blank" rel="noopener" style="--c:var(--g4);--s:var(--g4s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-pencil"></use></svg></div>
+    <div class="body"><h3>수업스케치</h3><p>성취기준 카드를 보며 필기와 아이디어 더하기</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g4);--gs:var(--g4s)">4학년</span><span>knightayj52.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://knightayj52.github.io/essay-grading/" target="_blank" rel="noopener" style="--c:var(--g5);--s:var(--g5s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-check"></use></svg></div>
+    <div class="body"><h3>논서술형 평가 도우미</h3><p>평가 기준과 학생 답안을 준비하고, AI 보조 채점으로 검토할 초안을 만들기</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g4);--gs:var(--g4s)">4학년</span><span>knightayj52.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://knightayj52.github.io/inquiry-strategies/" target="_blank" rel="noopener" style="--c:var(--g6);--s:var(--g6s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-magnify"></use></svg></div>
+    <div class="body"><h3>탐구 전략 사전</h3><p>탐구 전략 안내 및 성취기준에 맞는 전략과 수업 흐름 찾기</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g4);--gs:var(--g4s)">4학년</span><span>knightayj52.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://knightayj52.github.io/geulsup/" target="_blank" rel="noopener" style="--c:var(--g1);--s:var(--g1s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-tree"></use></svg></div>
+    <div class="body"><h3>글숲 · 글쓰기 교실</h3><p>글쓰기 과제와 AI 피드백, 고쳐 쓰기</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g4);--gs:var(--g4s)">4학년</span><span>knightayj52.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://ib-mastery-5120d.web.app/" target="_blank" rel="noopener" style="--c:var(--g2);--s:var(--g2s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-medal"></use></svg></div>
+    <div class="body"><h3>IB 마스터리</h3><p>학습자상과 ATL과 연결하여 학생 성찰 기록</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g4);--gs:var(--g4s)">4학년</span><span>ib-mastery-5120d.web.app</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://class-growth-test.knightayj.chatgpt.site/" target="_blank" rel="noopener" style="--c:var(--g3);--s:var(--g3s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-sprout"></use></svg></div>
+    <div class="body"><h3>우리반 성장일기</h3><p>매일의 미션과 감정 기록을 모아, 아바타와 함께 우리 반의 성장 알아보기</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g4);--gs:var(--g4s)">4학년</span><span>class-growth-test.knightayj.chatgpt.site</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://canva.link/lcbm5rae1of7y0f" target="_blank" rel="noopener" style="--c:var(--g4);--s:var(--g4s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-palette"></use></svg></div>
+    <div class="body"><h3>캔바</h3><p>자료 및 학생 보고서 제작</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g5);--gs:var(--g5s)">5학년</span><span>canva.link</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://quizn.show/pbd/info/board/1239008" target="_blank" rel="noopener" style="--c:var(--g5);--s:var(--g5s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-cloud"></use></svg></div>
+    <div class="body"><h3>퀴즈앤</h3><p>워드 클라우드 활용</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g5);--gs:var(--g5s)">5학년</span><span>quizn.show</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://padlet.com/DorothyJun/ib-6-1-s024pay6w21soroibofv" target="_blank" rel="noopener" style="--c:var(--g6);--s:var(--g6s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-board"></use></svg></div>
+    <div class="body"><h3>패들렛</h3><p>앱 박람회 후 사후 피드백 활용</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g6);--gs:var(--g6s)">6학년</span><span>padlet.com</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://maean-grade6-points.s2friendly.chatgpt.site/" target="_blank" rel="noopener" style="--c:var(--g1);--s:var(--g1s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-heart"></use></svg></div>
+    <div class="body"><h3>함께 자라는 하루</h3><p>학습자상과 연계한 QR 성장 기록 도구로 자신의 행동을 성찰하고, 존중·배려·책임을 일상에서 실천하기</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g6);--gs:var(--g6s)">6학년</span><span>maean-grade6-points.s2friendly.chatgpt.site</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://maeanschooltrip.pages.dev/" target="_blank" rel="noopener" style="--c:var(--g2);--s:var(--g2s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-backpack"></use></svg></div>
+    <div class="body"><h3>수학여행 기록지</h3><p>수학여행 미션 앱으로 현장 체험을 탐구와 기록으로 연결하고, 학생 주도적인 배움과 성찰 지원</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g6);--gs:var(--g6s)">6학년</span><span>maeanschooltrip.pages.dev</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://maean65chk.netlify.app/" target="_blank" rel="noopener" style="--c:var(--g3);--s:var(--g3s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-check"></use></svg></div>
+    <div class="body"><h3>우리반 체크</h3><p>학급 우유 마시기 체크 앱. 전자칠판에 띄워 학생 자치 역할로 관리</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g6);--gs:var(--g6s)">6학년</span><span>maean65chk.netlify.app</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://maean65ib13.netlify.app/" target="_blank" rel="noopener" style="--c:var(--g4);--s:var(--g4s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-bulb"></use></svg></div>
+    <div class="body"><h3>AI 분리수거 도우미 전시관</h3><span class="unit">UOI2 수업 결과물</span><p>모둠에서 만든 티칭머신을 학생 각자 바이브코딩으로 웹앱으로 만들어 게시</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g6);--gs:var(--g6s)">6학년</span><span>maean65ib13.netlify.app</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://maean65ver2.netlify.app/" target="_blank" rel="noopener" style="--c:var(--g5);--s:var(--g5s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-phone"></use></svg></div>
+    <div class="body"><h3>우리반 앱 전시관</h3><span class="unit">UOI2 수업 결과물</span><p>학생들이 바이브코딩으로 만든 앱 모음</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g6);--gs:var(--g6s)">6학년</span><span>maean65ver2.netlify.app</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://github.com/tues8557-source/ocr" target="_blank" rel="noopener" style="--c:var(--g6);--s:var(--g6s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-note"></use></svg></div>
+    <div class="body"><h3>시험지 OCR (손글씨 인식) 앱</h3><p>서술형 평가 손글씨 답안을 텍스트로 쉽게 바꿔 주는 앱 (로컬&nbsp;컴퓨터에서&nbsp;실행)</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g6);--gs:var(--g6s)">6학년</span><span>github.com</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://album-steel-pi.vercel.app/" target="_blank" rel="noopener" style="--c:var(--g1);--s:var(--g1s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-camera"></use></svg></div>
+    <div class="body"><h3>학교배경 컨셉사진</h3><p>졸업앨범 컨셉사진 촬영 연습을 위해 모둠별로 사진을 찍어 올리는 앨범</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g6);--gs:var(--g6s)">6학년</span><span>album-steel-pi.vercel.app</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://tues8557-cmyk.github.io/squared_manuscript/" target="_blank" rel="noopener" style="--c:var(--g2);--s:var(--g2s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-pencil"></use></svg></div>
+    <div class="body"><h3>원고지 쓰기</h3><p>태블릿으로 원고지 쓰기를 연습하는 앱. 띄어쓰기 학습에 좋아요</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g6);--gs:var(--g6s)">6학년</span><span>tues8557-cmyk.github.io</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://maean65dokdo.netlify.app/" target="_blank" rel="noopener" style="--c:var(--g3);--s:var(--g3s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-compass"></use></svg></div>
+    <div class="body"><h3>독도 탈출 미션</h3><p>독도의 날 학생회 퀴즈한마당 사전교육용 방탈출 퀴즈</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g6);--gs:var(--g6s)">6학년</span><span>maean65dokdo.netlify.app</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://executive-news.vercel.app/" target="_blank" rel="noopener" style="--c:var(--g4);--s:var(--g4s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-scroll"></use></svg></div>
+    <div class="body"><h3>행정부 카드뉴스</h3><span class="unit">1학기 사회 2단원</span><p>정부 부처 카드뉴스를 보고 어느 부처에서 만들었는지 맞히는 퀴즈</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g6);--gs:var(--g6s)">6학년</span><span>executive-news.vercel.app</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a><a class="card" href="https://maean65laboca.netlify.app/" target="_blank" rel="noopener" style="--c:var(--g5);--s:var(--g5s);animation-delay:600ms">
+    <div class="ic"><svg viewBox="0 0 24 24"><use href="#i-blocks"></use></svg></div>
+    <div class="body"><h3>마주 쌓기</h3><span class="unit">2학기 수학 3단원</span><p>공간과 입체를 다루는 보드게임을 온라인으로 옮긴 2인 협동 게임</p>
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g6);--gs:var(--g6s)">6학년</span><span>maean65laboca.netlify.app</span></div></div>
+    <div class="go"><svg viewBox="0 0 24 24"><use href="#i-arrow"></use></svg></div></a></div></div>
+</main>
+
+<footer>
+  <span class="pencil">✏️</span> 매안초등학교 IB 디지털 도구 · 2026년 11월 기준
+</footer>
+
+<script>
+const PALETTE = [
+  {c:"var(--g1)", s:"var(--g1s)"},{c:"var(--g2)", s:"var(--g2s)"},{c:"var(--g3)", s:"var(--g3s)"},
+  {c:"var(--g4)", s:"var(--g4s)"},{c:"var(--g5)", s:"var(--g5s)"},{c:"var(--g6)", s:"var(--g6s)"},
+];
+
+const TOOLS = [
+  ["1","Apps Script","게임 제작","https://script.google.com/macros/s/AKfycbyAlm3U1H61gmzyvUKrQMH8ieB-FloB9epJpooh4oX7hadfnScaGYk_mOryaEoCNho/exec","game"],
+  ["2","패들렛","학생 활동 내용 공유","https://padlet.com/seonwoong2533/2026-5-11-5-24-w5gnuc5raxhizl1m","board"],
+  ["3","자기 이해 진단 IBTI\u00a0(학생)","나는 어떤 학습자상일까? 진단해보는 앱","https://indra-87.github.io/ibti/","compass"],
+  ["3","자기 이해 진단 IBTI\u00a0(성인)","나는 어떤 학습자상일까? 진단해보는 앱","https://indra-87.github.io/adibti/","people"],
+  ["3","감정 출석부","탐구단원1 나의 감정을 다양하게 표현하는 방법","https://indra-87.github.io/emocheck/","heart"],
+  ["3","소리보물 노래 만들기","탐구단원1 소리보물 노래 가사로 노래 만들기","https://indra-87.github.io/songmaker","music"],
+  ["3","패들렛 샌드박스","탐구단원2 관계맺기 / 질문 만들기 수업","https://padlet.com/indra87/2-cmdm3chjy7fsgsqb","board"],
+  ["3","옛이야기 속 인물 챗봇","탐구단원2 저출산 고령화 수업 / 옛 이야기의 배경을 바꾸어 써보기","https://indra-87.github.io/story/","chat"],
+  ["3","이야기 속 앱 제작 공방","탐구단원2 지능정보화 수업 / 이야기 속 인물의 문제점을 해결해주는 앱 제작하기","https://indra-87.github.io/simapp/","phone"],
+  ["3","세계여행 무역수첩","탐구단원2 세계화 수업 / 심청이의 세계여행 상상일기 쓰기","https://indra-87.github.io/voyage/","globe"],
+  ["3","패들렛","심청이의 세계여행 상상일기 게시용 패들렛","https://padlet.com/indra87/4-al7baxbflmllg3xg","board"],
+  ["3","세계 음식 조사","탐구단원2 세계화 수업 / 세계 음식을 조사하고 소개카드 만들기","https://indra-87.github.io/food-search/","bowl"],
+  ["3","학습 게임 제작 앱","탐구단원2 작품 발표회를 위한 게임 앱을 제작하는 앱","https://indra-87.github.io/vibe","game"],
+  ["3","패들렛","탐구단원2 작품 발표회를 위해 학생들이 제작한 게임 앱 모음","https://padlet.com/indra87/3-s024gajcl1wudgo6vxjk","board"],
+  ["3","옛날과 오늘날의 풍습 조사 앱","탐구단원3 옛날과 오늘날의 풍습을 조사하고 비교하기","https://indra-87.github.io/customs/","scroll"],
+  ["3","IB UOI 학생 평가 시스템","IB UOI 서술형 평가 채점 도움 프로그램","https://indra-87.github.io/ib-uoi-eval/","check"],
+  ["4","수업 블로그 기록","수업 복기","https://knightayj52.github.io/lesson-blog/","note"],
+  ["4","개념기반 단원설계 도우미","개념기반 탐구수업 단원 설계를 위한 웹 앱","https://knightayj52.github.io/Lesson-Design/","blocks"],
+  ["4","PYP 탐구 단원 설계","초학문적 주제와 성취기준을 연결해 중심아이디어부터 탐구 과정까지 정리","https://knightayj52.github.io/PYP-Planner/","calendar"],
+  ["4","수업 실행 도우미","단원 설계안을 차시별 수업과 일정 연결, 수업자료 제작","https://knightayj52.github.io/Lesson-Runner/","chalk"],
+  ["4","개념 한 걸음","학생의 오개념 예상 및 질문과 교정 발문 준비","https://knightayj52.github.io/concept-step/","bulb"],
+  ["4","수업스케치","성취기준 카드를 보며 필기와 아이디어 더하기","https://knightayj52.github.io/lesson-sketch/","pencil"],
+  ["4","논서술형 평가 도우미","평가 기준과 학생 답안을 준비하고, AI 보조 채점으로 검토할 초안을 만들기","https://knightayj52.github.io/essay-grading/","check"],
+  ["4","탐구 전략 사전","탐구 전략 안내 및 성취기준에 맞는 전략과 수업 흐름 찾기","https://knightayj52.github.io/inquiry-strategies/","magnify"],
+  ["4","글숲 · 글쓰기 교실","글쓰기 과제와 AI 피드백, 고쳐 쓰기","https://knightayj52.github.io/geulsup/","tree"],
+  ["4","IB 마스터리","학습자상과 ATL과 연결하여 학생 성찰 기록","https://ib-mastery-5120d.web.app/","medal"],
+  ["4","우리반 성장일기","매일의 미션과 감정 기록을 모아, 아바타와 함께 우리 반의 성장 알아보기","https://class-growth-test.knightayj.chatgpt.site/","sprout"],
+  ["5","캔바","자료 및 학생 보고서 제작","https://canva.link/lcbm5rae1of7y0f","palette"],
+  ["5","퀴즈앤","워드 클라우드 활용","https://quizn.show/pbd/info/board/1239008","cloud"],
+  ["6","패들렛","앱 박람회 후 사후 피드백 활용","https://padlet.com/DorothyJun/ib-6-1-s024pay6w21soroibofv","board"],
+  ["6","함께 자라는 하루","학습자상과 연계한 QR 성장 기록 도구로 자신의 행동을 성찰하고, 존중·배려·책임을 일상에서 실천하기","https://maean-grade6-points.s2friendly.chatgpt.site/","heart"],
+  ["6","수학여행 기록지","수학여행 미션 앱으로 현장 체험을 탐구와 기록으로 연결하고, 학생 주도적인 배움과 성찰 지원","https://maeanschooltrip.pages.dev/","backpack"],
+  ["6","우리반 체크","학급 우유 마시기 체크 앱. 전자칠판에 띄워 학생 자치 역할로 관리","https://maean65chk.netlify.app/","check"],
+  ["6","AI 분리수거 도우미 전시관","UOI2 수업 결과물 / 모둠에서 만든 티칭머신을 학생 각자 바이브코딩으로 웹앱으로 만들어 게시","https://maean65ib13.netlify.app/","bulb"],
+  ["6","우리반 앱 전시관","UOI2 수업 결과물 / 학생들이 바이브코딩으로 만든 앱 모음","https://maean65ver2.netlify.app/","phone"],
+  ["6","시험지 OCR (손글씨 인식) 앱","서술형 평가 손글씨 답안을 텍스트로 쉽게 바꿔 주는 앱 (로컬\u00a0컴퓨터에서\u00a0실행)","https://github.com/tues8557-source/ocr","note"],
+  ["6","학교배경 컨셉사진","졸업앨범 컨셉사진 촬영 연습을 위해 모둠별로 사진을 찍어 올리는 앨범","https://album-steel-pi.vercel.app/","camera"],
+  ["6","원고지 쓰기","태블릿으로 원고지 쓰기를 연습하는 앱. 띄어쓰기 학습에 좋아요","https://tues8557-cmyk.github.io/squared_manuscript/","pencil"],
+  ["6","독도 탈출 미션","독도의 날 학생회 퀴즈한마당 사전교육용 방탈출 퀴즈","https://maean65dokdo.netlify.app/","compass"],
+  ["6","행정부 카드뉴스","1학기 사회 2단원 / 정부 부처 카드뉴스를 보고 어느 부처에서 만들었는지 맞히는 퀴즈","https://executive-news.vercel.app/","scroll"],
+  ["6","마주 쌓기","2학기 수학 3단원 / 공간과 입체를 다루는 보드게임을 온라인으로 옮긴 2인 협동 게임","https://maean65laboca.netlify.app/","blocks"],
+].map(([g,name,desc,url,icon,home])=>({g,name,desc,url,icon,home:!!home}));
+
+const $list = document.getElementById('list');
+const $q = document.getElementById('q');
+
+const ico = (id)=>`<svg viewBox="0 0 24 24"><use href="#i-${id}"/></svg>`;
+const host = (u)=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch(e){return ''}};
+const esc = (s)=>s.replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+
+
+function descHTML(d){
+  let unit='', rest=d;
+  const parts=d.split(' / ');
+  if(parts.length>1){ unit=parts[0]; rest=parts.slice(1).join(' / '); }
+  else { const m=d.match(/^(탐구단원\d)\s+(.*)$/); if(m){unit=m[1]; rest=m[2];} }
+  return (unit?`<span class="unit">${esc(unit)}</span>`:'')+`<p>${esc(rest)}</p>`;
+}
+function card(t, gr, i){
+  const style = `--c:${gr.c};--s:${gr.s};animation-delay:${Math.min(i*40,600)}ms`;
+  if(!t.url){
+    return `<div class="card off" style="${style}">
+      <div class="ic">${ico(t.icon)}</div>
+      <div class="body"><h3>${esc(t.name)}</h3>${descHTML(t.desc)}
+      <div class="meta"><span class="note">🔗 링크 준비 중</span></div></div></div>`;
+  }
+  return `<a class="card" href="${t.url}" target="_blank" rel="noopener" style="${style}">
+    <div class="ic">${ico(t.icon)}</div>
+    <div class="body"><h3>${esc(t.name)}</h3>${descHTML(t.desc)}
+      <div class="meta"><span class="grade-tag" style="--gc:var(--g${t.g});--gs:var(--g${t.g}s)">${t.g}학년</span><span>${host(t.url)}</span></div></div>
+    <div class="go">${ico('arrow')}</div></a>`;
+}
+
+function render(){
+  const q = $q.value.trim().toLowerCase();
+  const items = TOOLS.filter(t=>!q || (t.name+' '+t.desc).toLowerCase().includes(q));
+  if(!items.length){
+    $list.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24"><use href="#i-magnify"/></svg>
+      <p class="jua" style="font-size:20px;margin:10px 0 4px">찾는 도구가 없어요</p><p>다른 낱말로 검색해 보세요.</p></div>`;
+    return;
+  }
+  $list.innerHTML = `<div class="list-head"><span class="jua">전체 도구</span><span class="count">${items.length}개</span><span class="rule"></span></div>
+    <div class="grid">${items.map((t,i)=>card(t, PALETTE[TOOLS.indexOf(t)%PALETTE.length], i)).join('')}</div>`;
+}
+
+$q.addEventListener('input', render);
+
+render();
+</script>
+
+
+</body></html>

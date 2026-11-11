@@ -79,8 +79,8 @@ function checkinOpen(){
 }
 
 /* ---------- 머리말 / 꼬리말 ---------- */
-/* 상단 메뉴 'IB 도구모음' = IB 디지털 도구모음 (외부 페이지 · 새 창으로 열림). 주소를 바꿀 때는 index.html의 바로가기 주소도 함께 바꿔 주세요 */
-const TOOLS_URL = "https://claude.ai/artifact/QMQPdT4BvzftonhDezbMFQ";
+/* 상단 메뉴 'IB 도구모음' = IB 디지털 도구모음 (tools.html) */
+const TOOLS_URL = "tools.html";   // 사이트 안의 페이지 (claude.ai 로그인 없이 열림)
 const NAV = [
   ["classes.html", "공개수업"],
   ["index.html#schedule", "당일 일정"],
