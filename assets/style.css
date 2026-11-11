@@ -430,3 +430,20 @@ body.page-admin{background:#eef0f6}
 @media(max-width:520px){.posts-in{grid-template-columns:1fr}.post:nth-child(n){border-left:0;border-top:1px solid var(--line)}.post:first-child{border-top:0}}
 /* 휴대폰: 메뉴 6개를 옆으로 밀지 않고 두 줄로 모두 보이게 */
 @media(max-width:600px){.menu{flex-wrap:wrap;overflow-x:visible;row-gap:0;margin:0 -6px}.menu a{padding:6px 7px}}
+
+/* ===== 강당 배치도: 미리보기 그림 + 크게 보기 ===== */
+.hall-fig{margin:0}
+.hall-thumb{display:block;width:100%;padding:0;border:0;background:#f6efe4;border-radius:10px;overflow:hidden;cursor:zoom-in;position:relative;box-shadow:0 0 0 1px var(--line)}
+.hall-thumb img{display:block;width:100%;height:auto;aspect-ratio:1409/815}
+.hall-zoom{position:absolute;right:8px;bottom:8px;background:rgba(28,35,71,.82);color:#fff;font:600 .78rem var(--body);padding:4px 10px;border-radius:999px}
+.booth-pop .sheet{max-width:620px}
+.lb{position:fixed;inset:0;z-index:400;background:rgba(12,15,32,.94);display:flex;flex-direction:column}
+.lb-bar{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 16px;color:#fff}
+.lb-bar b{font:1.1rem var(--display);white-space:nowrap}
+.lb-hint{flex:1;min-width:0;font-size:.78rem;color:#aeb4d3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-x{flex:none;width:40px;height:40px;border:0;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-size:1.1rem;cursor:pointer}
+.lb-scroll{flex:1;overflow:auto;display:grid;place-items:center;padding:8px;-webkit-overflow-scrolling:touch}
+.lb-scroll img{max-width:100%;max-height:100%;width:auto;height:auto;cursor:zoom-in;border-radius:6px}
+.lb.zoomed .lb-scroll{display:block}
+.lb.zoomed .lb-scroll img{max-width:none;max-height:none;width:clamp(940px,240vw,1409px);cursor:zoom-out}
+@media(max-width:520px){.lb-hint{display:none}}

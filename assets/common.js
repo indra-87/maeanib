@@ -188,7 +188,7 @@ async function openClassModal(code, room){
     $("#cmPlate").textContent = "2층"; $("#cmPlate").hidden = false; modal.querySelector(".sheet").dataset.floor = "2";
     $("#cmTag").innerHTML = `<span>보고회장</span>`; $("#cmTitle").textContent = "강당 (보고회장)";
     const items = ((data && data.schedule) || []).filter(r => /강당|체육관/.test(r.where + r.what));
-    $("#cmBody").innerHTML = (items.length ? `<ol class="mini-tl">${items.map(r => `<li><b>${esc(r.start)}${r.end ? "~" + esc(r.end) : ""}</b><span>${esc(r.what)}</span></li>`).join("")}</ol>` : "")
+    $("#cmBody").innerHTML = hallFigure() + (items.length ? `<ol class="mini-tl">${items.map(r => `<li><b>${esc(r.start)}${r.end ? "~" + esc(r.end) : ""}</b><span>${esc(r.what)}</span></li>`).join("")}</ol>` : "")
       + `<p class="muted">연구학교 운영 결과 공유와 질의응답이 이곳에서 열립니다.</p><a class="btn btn-line wide" href="index.html#schedule">전체 일정 보기</a>`;
     lastFocus = document.activeElement; modal.hidden = false; document.body.style.overflow = "hidden"; $("#cmClose").focus();
     return;
@@ -265,12 +265,42 @@ async function openClassModal(code, room){
   });
 }
 
+/* ---------- 그림 크게 보기 (강당 배치도 등) ----------
+   열면 화면에 맞춰 보이고, 그림을 누르면 실제 크기로 커져 손가락으로 밀어 볼 수 있음. 다시 누르면 화면 맞춤 */
+const HALL_IMG = "assets/hall-layout.jpg";
+function openImage(src, title){
+  const lb = document.createElement("div");
+  lb.className = "lb"; lb.setAttribute("role", "dialog"); lb.setAttribute("aria-modal", "true"); lb.setAttribute("aria-label", title || "그림 크게 보기");
+  lb.innerHTML = `<div class="lb-bar"><b>${esc(title || "")}</b><span class="lb-hint">그림을 누르면 크게 · 다시 누르면 화면에 맞춤</span><button class="lb-x" type="button" aria-label="닫기">✕</button></div>
+    <div class="lb-scroll"><img src="${esc(src)}" alt="${esc(title || "")}"></div>`;
+  const sc = lb.querySelector(".lb-scroll"), img = lb.querySelector("img");
+  img.addEventListener("click", e => {
+    const r = img.getBoundingClientRect(), fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
+    const zoom = !lb.classList.contains("zoomed"); lb.classList.toggle("zoomed", zoom);
+    if (zoom) requestAnimationFrame(() => { sc.scrollLeft = img.offsetWidth * fx - sc.clientWidth / 2; sc.scrollTop = img.offsetHeight * fy - sc.clientHeight / 2; });
+  });
+  const prevOverflow = document.body.style.overflow;
+  const close = () => { lb.remove(); document.body.style.overflow = prevOverflow; removeEventListener("keydown", onKey); };
+  const onKey = e => { if (e.key === "Escape") close(); };
+  lb.querySelector(".lb-x").onclick = close;
+  sc.addEventListener("click", e => { if (e.target === sc) close(); });
+  addEventListener("keydown", onKey);
+  document.body.append(lb); document.body.style.overflow = "hidden"; lb.querySelector(".lb-x").focus();
+}
+/* 배치도 미리보기 그림 (누르면 크게) */
+function hallFigure(){
+  return `<figure class="hall-fig"><button type="button" class="hall-thumb" data-open-hall aria-label="강당 배치도 크게 보기">
+      <img src="${HALL_IMG}" alt="2층 강당(보고회장) 배치도: 무대, 내빈석·관계자석, 1~6학년 탐구 결과물 전시, 미디어 체험, 입구 옆 등록부 책상" loading="lazy">
+      <span class="hall-zoom">🔍 눌러서 크게 보기</span></button></figure>`;
+}
+document.addEventListener("click", e => { if (e.target.closest("[data-open-hall]")) openImage(HALL_IMG, "강당(보고회장) 배치도"); });
+
 function toast(msg){
   document.querySelectorAll(".toast").forEach(x => x.remove());
   const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; t.setAttribute("role", "status");
   document.body.append(t); setTimeout(() => t.remove(), 2600);
 }
 
-window.Maean = { CFG, BASE, esc, TOOLS_URL, viewUrl, isViewable, rpc, newToken, lsGet, lsSet, REST, KEY, fmtTime, renderChrome, loadContent, loadError, openClassModal, checkinOpen, fileUrl, downloadUrl, logCheckin, toast, kstToday, FLOOR_EXTRA, floorOf };
+window.Maean = { CFG, BASE, esc, openImage, hallFigure, HALL_IMG, TOOLS_URL, viewUrl, isViewable, rpc, newToken, lsGet, lsSet, REST, KEY, fmtTime, renderChrome, loadContent, loadError, openClassModal, checkinOpen, fileUrl, downloadUrl, logCheckin, toast, kstToday, FLOOR_EXTRA, floorOf };
 window.openClassModal = openClassModal;   // 3D 뷰어(iframe)가 이 함수를 부릅니다
 })();
